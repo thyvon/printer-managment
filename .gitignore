@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Env
+.env
+.env.local
+
+# Node
+node_modules/
+.next/
+out/
+coverage/
+
+# PHP / Laravel
+/vendor/
+backend/.phpunit.cache/
+backend/storage/logs/*.log
+
+# Go
+collector/collector
+collector/*.db
+collector/printer-mps-collector
+
+# Playwright
+test-results/
+playwright-report/
+
+# Editor
+.idea/
+.vscode/

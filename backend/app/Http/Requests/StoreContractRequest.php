@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreContractRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class StoreContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['required', 'exists:customers,id'],
+            'customer_id' => ['required', Rule::exists('customers', 'id')->where('company_id', tenantCompanyId())],
             'name' => ['required', 'string', 'max:255'],
             'status' => ['sometimes', 'in:active,pending,expired,cancelled'],
             'monthly_fee' => ['nullable', 'numeric', 'min:0'],

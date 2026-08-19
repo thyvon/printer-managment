@@ -15,7 +15,7 @@ class UpdatePrinterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'site_id' => ['sometimes', 'exists:sites,id'],
+            'site_id' => ['sometimes', Rule::exists('sites', 'id')->where('company_id', tenantCompanyId())],
             'name' => ['sometimes', 'string', 'max:255'],
             'manufacturer' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],

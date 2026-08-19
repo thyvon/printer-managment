@@ -7,6 +7,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use function setTenantCompany;
+
 class CollectorAuth
 {
     public function handle(Request $request, Closure $next): Response
@@ -19,9 +21,15 @@ class CollectorAuth
             return response()->json(['message' => 'Invalid collector token.'], 401);
         }
 
+        setTenantCompany($collector->company_id);
+
         $request->merge(['collector' => $collector]);
         $request->setUserResolver(fn () => $collector);
 
-        return $next($request);
+        $response = $next($request);
+
+        setTenantCompany(null);
+
+        return $response;
     }
 }

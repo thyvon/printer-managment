@@ -4,9 +4,11 @@ This file is the source of truth for how to build and maintain this project. Rea
 
 ## Project Overview
 
-Cloud-based **Printer Fleet Management & Automated Billing** platform for Cambodian managed-print-service (MPS) and printer-rental businesses.
+Cloud-based **Multi-Tenant SaaS Printer Fleet Management & Automated Billing** platform for Cambodian managed-print-service (MPS) and printer-rental businesses.
 
 Flow: SNMP collector agent at customer site → cloud backend → contract pricing → auto-invoice.
+
+Architecture: **BelongsToCompany multi-tenancy**. Every business record (customers, sites, contacts, printers, contracts, pricing tiers, collectors, counter readings, usages, invoices, invoice lines) and every user belongs to a `Company` (tenant). A global scope filters all queries to the current tenant; a `creating` hook stamps `company_id` so cross-tenant writes cannot happen by accident. The SaaS spec lives in `printer_mps_saas_platform_proposal.md` (the original single-tenant `printer_mps_system_proposal.md` is superseded but kept for reference).
 
 ## Monorepo Layout
 
@@ -87,6 +89,7 @@ Printer ──SNMP──▶ collector agent ──HTTPS──▶ Laravel API ─
 ```
 
 Key design decisions (from the proposal):
+- **Multi-tenant by default**: every business model uses the `BelongsToCompany` trait (`app/Models/Concerns/BelongsToCompany.php`) — a global scope filters reads to the current tenant and a `creating` hook stamps `company_id` on writes. Tenant resolution (see `app/Support/tenant_helpers.php`): explicit context set by collector/console job via `setTenantCompany()`, else the authenticated user's `company_id`. When no tenant is resolved, the scope is inert — so **background jobs (commands, collectors) must call `setTenantCompany()`** explicitly (e.g. `CalculateMonthlyUsage`/`GenerateMonthlyInvoices` iterate `Company::all()` and set tenant per company; `CollectorAuth` middleware sets it from the collector).
 - Counter readings are **append-only** — never overwritten — preserving an audit trail for billing disputes.
 - Collector **buffers locally** (bbolt) and retries on connectivity loss (unreliable SME internet).
 - Billing is contract-driven: usage deltas × per-customer pricing tiers (included volume, color/mono split).
@@ -100,6 +103,9 @@ Key design decisions (from the proposal):
 - i18n: add all user-facing strings to `frontend/messages/{en,km}.json`; never hardcode UI text.
 - Multi-currency: support KHR/USD dual pricing where relevant.
 - Match existing style in the file being edited.
+- **New business models must** use the `BelongsToCompany` trait, include `company_id` in `#[Fillable]`, and have a `company_id` column migration.
+- **Validation**: any `exists:` rule that references a tenant-owned table must be scoped with `Rule::exists(...)->where('company_id', tenantCompanyId())` (plain `exists:` bypasses the global scope and enables cross-tenant references).
+- **Tests**: scope fixtures to the acting user's tenant via the `makeTenant()` helper in `tests/Pest.php` (returns a `Company`, authenticates its owner) and pass `['company_id' => $company->id]` to factories. `Company::factory()->create()` produces a *different* tenant by default, so un-scoped fixtures are invisible to scoped queries — use that to test cross-tenant isolation.
 
 ## Testing Strategy
 
@@ -113,9 +119,9 @@ Phases: discovery → foundation (Customer/Printer/Contract/User) → collector+
 
 ## Branching / Workflow
 
-This project is **not yet a git repo at the root**. Initialize and commit early so changes are trackable, then:
+The repo is a git repo at the root (initialized; commits made). Follow this workflow:
 - One branch/PR per feature or module.
-- Keep the proposal (`printer_mps_system_proposal.md`) in sync with what's actually built.
+- Keep the proposal (`printer_mps_saas_platform_proposal.md`) in sync with what's actually built.
 
 ## Handoff Notes for the Senior AI
 

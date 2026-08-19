@@ -2,39 +2,41 @@
 
 use App\Models\Collector;
 use App\Models\Site;
-use App\Models\User;
 
 it('registers a collector and returns its token', function () {
-    $site = Site::factory()->create();
+    $company = makeTenant();
+    $site = Site::factory()->create(['company_id' => $company->id]);
 
-    $response = $this->actingAs(User::factory()->create())
-        ->postJson('/api/collectors', [
-            'site_id' => $site->id,
-            'name' => 'Site Collector',
-        ])
+    $response = $this->postJson('/api/collectors', [
+        'site_id' => $site->id,
+        'name' => 'Site Collector',
+    ])
         ->assertCreated()
         ->assertJsonStructure(['data', 'token']);
 
-    expect(Collector::where('name', 'Site Collector')->exists())->toBeTrue()
+    $collector = Collector::where('name', 'Site Collector')->first();
+
+    expect($collector)->not->toBeNull()
+        ->and($collector->company_id)->toBe($company->id)
         ->and(strlen($response->json('token')))->toBe(64);
 });
 
 it('token is not exposed in the resource', function () {
-    $collector = Collector::factory()->create();
+    $company = makeTenant();
+    $collector = Collector::factory()->create(['company_id' => $company->id]);
 
-    $this->actingAs(User::factory()->create())
-        ->getJson("/api/collectors/{$collector->id}")
+    $this->getJson("/api/collectors/{$collector->id}")
         ->assertOk()
         ->assertJsonMissing(['token' => $collector->token]);
 });
 
 it('requires a valid site on register', function () {
-    $this->actingAs(User::factory()->create())
-        ->postJson('/api/collectors', [
-            'site_id' => 9999,
-            'name' => 'Orphan',
-        ])
-        ->assertUnprocessable();
+    makeTenant();
+
+    $this->postJson('/api/collectors', [
+        'site_id' => 9999,
+        'name' => 'Orphan',
+    ])->assertUnprocessable();
 });
 
 it('rejects heartbeat with an invalid token', function () {

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Company;
 use App\Models\Contract;
 use App\Models\PricingTier;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -14,6 +15,7 @@ class PricingTierFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => Company::factory(),
             'contract_id' => Contract::factory(),
             'name' => 'Tier 1',
             'currency' => 'USD',

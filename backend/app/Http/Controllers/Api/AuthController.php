@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,12 +18,27 @@ class AuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'company_name' => ['required', 'string', 'max:255'],
         ]);
 
-        $user = User::create([...$data, 'role' => 'staff']);
+        $company = Company::create([
+            'name' => $data['company_name'],
+            'plan' => 'starter',
+            'status' => 'trial',
+            'device_limit' => 20,
+        ]);
+
+        $user = User::create([
+            'company_id' => $company->id,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => 'admin',
+        ]);
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('company'),
+            'company' => $company,
             'token' => $user->createToken('auth-token')->plainTextToken,
         ], 201);
     }
@@ -43,7 +59,7 @@ class AuthController extends Controller
         $user = auth()->user();
 
         return response()->json([
-            'user' => $user,
+            'user' => $user->load('company'),
             'token' => $user->createToken('auth-token')->plainTextToken,
         ]);
     }

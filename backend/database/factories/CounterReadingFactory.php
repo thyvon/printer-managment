@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Collector;
+use App\Models\Company;
 use App\Models\CounterReading;
 use App\Models\Printer;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -15,6 +16,7 @@ class CounterReadingFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => Company::factory(),
             'collector_id' => Collector::factory(),
             'printer_id' => Printer::factory(),
             'total_pages' => fake()->numberBetween(0, 200000),

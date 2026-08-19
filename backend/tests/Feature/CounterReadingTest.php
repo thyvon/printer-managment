@@ -6,9 +6,10 @@ use App\Models\Printer;
 use App\Models\Site;
 
 it('stores counter readings as an append-only batch', function () {
-    $site = Site::factory()->create();
-    $collector = Collector::factory()->create(['site_id' => $site->id]);
-    $printer = Printer::factory()->create(['site_id' => $site->id]);
+    $company = makeTenant();
+    $site = Site::factory()->create(['company_id' => $company->id]);
+    $collector = Collector::factory()->create(['site_id' => $site->id, 'company_id' => $company->id]);
+    $printer = Printer::factory()->create(['site_id' => $site->id, 'company_id' => $company->id]);
 
     $response = $this->postJson('/api/collector/readings', [
         'readings' => [
@@ -31,14 +32,15 @@ it('stores counter readings as an append-only batch', function () {
         ->assertOk()
         ->assertJsonPath('count', 2);
 
-    expect(CounterReading::count())->toBe(2);
+    expect(CounterReading::count())->toBe(2)
+        ->and(CounterReading::first()->company_id)->toBe($company->id);
 });
 
 it('rejects a reading for a printer outside the collectors site', function () {
-    $site = Site::factory()->create();
-    $otherSite = Site::factory()->create();
-    $collector = Collector::factory()->create(['site_id' => $site->id]);
-    $foreignPrinter = Printer::factory()->create(['site_id' => $otherSite->id]);
+    $company = makeTenant();
+    $site = Site::factory()->create(['company_id' => $company->id]);
+    $collector = Collector::factory()->create(['site_id' => $site->id, 'company_id' => $company->id]);
+    $foreignPrinter = Printer::factory()->create();
 
     $this->postJson('/api/collector/readings', [
         'readings' => [

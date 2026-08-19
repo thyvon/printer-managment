@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Collector;
+use App\Models\Company;
 use App\Models\Site;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,6 +15,7 @@ class CollectorFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => Company::factory(),
             'site_id' => Site::factory(),
             'name' => fake()->word().' Collector',
             'token' => fake()->sha256(),

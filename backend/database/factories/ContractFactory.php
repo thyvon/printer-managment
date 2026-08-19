@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Company;
 use App\Models\Contract;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -14,6 +15,7 @@ class ContractFactory extends Factory
     public function definition(): array
     {
         return [
+            'company_id' => Company::factory(),
             'customer_id' => Customer::factory(),
             'name' => fake()->randomElement(['Standard', 'Premium', 'Economy']).' Plan',
             'status' => 'active',

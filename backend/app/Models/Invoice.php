@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['customer_id', 'contract_id', 'invoice_number', 'period_start', 'period_end', 'currency', 'subtotal', 'tax', 'total', 'status'])]
+#[Fillable(['company_id', 'customer_id', 'contract_id', 'invoice_number', 'period_start', 'period_end', 'currency', 'subtotal', 'tax', 'total', 'status'])]
 class Invoice extends Model
 {
-    use HasFactory;
+    use BelongsToCompany, HasFactory;
 
     protected function casts(): array
     {

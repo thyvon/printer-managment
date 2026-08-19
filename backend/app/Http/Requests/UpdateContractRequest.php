@@ -15,7 +15,7 @@ class UpdateContractRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_id' => ['sometimes', 'exists:customers,id'],
+            'customer_id' => ['sometimes', Rule::exists('customers', 'id')->where('company_id', tenantCompanyId())],
             'name' => ['sometimes', 'string', 'max:255'],
             'status' => ['sometimes', Rule::in(['active', 'pending', 'expired', 'cancelled'])],
             'monthly_fee' => ['nullable', 'numeric', 'min:0'],

@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['site_id', 'name', 'manufacturer', 'model', 'serial_number', 'ip_address', 'snmp_community', 'status'])]
+#[Fillable(['company_id', 'site_id', 'name', 'manufacturer', 'model', 'serial_number', 'ip_address', 'snmp_community', 'status'])]
 class Printer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use BelongsToCompany, HasFactory, SoftDeletes;
 
     public function site()
     {

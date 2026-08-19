@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['printer_id', 'period_start', 'period_end', 'start_reading_id', 'end_reading_id', 'total_pages', 'mono_pages', 'color_pages'])]
+#[Fillable(['company_id', 'printer_id', 'period_start', 'period_end', 'start_reading_id', 'end_reading_id', 'total_pages', 'mono_pages', 'color_pages'])]
 class Usage extends Model
 {
-    use HasFactory;
+    use BelongsToCompany, HasFactory;
 
     protected function casts(): array
     {

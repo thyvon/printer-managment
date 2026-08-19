@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToCompany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['collector_id', 'printer_id', 'total_pages', 'mono_pages', 'color_pages', 'read_at'])]
+#[Fillable(['company_id', 'collector_id', 'printer_id', 'total_pages', 'mono_pages', 'color_pages', 'read_at'])]
 class CounterReading extends Model
 {
-    use HasFactory;
+    use BelongsToCompany, HasFactory;
 
     protected function casts(): array
     {

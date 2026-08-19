@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreCollectorRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class StoreCollectorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'site_id' => ['required', 'exists:sites,id'],
+            'site_id' => ['required', Rule::exists('sites', 'id')->where('company_id', tenantCompanyId())],
             'name' => ['required', 'string', 'max:255'],
         ];
     }

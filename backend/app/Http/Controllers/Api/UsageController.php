@@ -20,6 +20,6 @@ class UsageController extends Controller
             $query->whereBetween('period_start', [Carbon::parse($month.'-01')->startOfMonth(), Carbon::parse($month.'-01')->endOfMonth()]);
         }
 
-        return UsageResource::collection($query->latest('period_start')->paginate());
+        return UsageResource::collection($query->latest('period_start')->paginate(request()->integer('per_page', 15)));
     }
 }

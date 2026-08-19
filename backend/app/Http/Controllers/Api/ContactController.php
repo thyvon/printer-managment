@@ -12,7 +12,13 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return ContactResource::collection(Contact::latest()->paginate());
+        $query = Contact::latest();
+
+        if (request()->has('customer_id')) {
+            $query->where('customer_id', request()->integer('customer_id'));
+        }
+
+        return ContactResource::collection($query->paginate(request()->integer('per_page', 15)));
     }
 
     public function store(StoreContactRequest $request)

@@ -7,5 +7,237 @@
     "switchTo": "Switch language",
     "en": "English",
     "km": "ភាសាខ្មែរ"
+  },
+  "App": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "customers": "Customers",
+      "sites": "Sites",
+      "printers": "Printers",
+      "contracts": "Contracts",
+      "invoices": "Invoices",
+      "usages": "Usage"
+    },
+    "logout": "Log out"
+  },
+  "Auth": {
+    "title": "Printer MPS",
+    "subtitle": "Fleet management & automated billing for print services",
+    "login": "Sign in",
+    "loggingIn": "Signing in…",
+    "email": "Email",
+    "password": "Password",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account…",
+    "registerSubtitle": "Start your free trial — manage printers and billing in one place",
+    "companyName": "Company name",
+    "yourName": "Your name",
+    "confirmPassword": "Confirm password",
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "passwordMismatch": "Passwords do not match."
+    }
+  },
+  "Common": {
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "create": "Create",
+    "previous": "Previous",
+    "next": "Next",
+    "showing": "Showing {from}–{to} of {total}",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "online": "Online",
+      "offline": "Offline",
+      "maintenance": "Maintenance",
+      "pending": "Pending",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "sent": "Sent",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "void": "Void"
+    },
+    "errors": {
+      "generic": "Something went wrong. Please try again.",
+      "load": "Could not load data. Please try again."
+    }
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your print fleet and billing",
+    "stats": {
+      "customers": "Customers",
+      "sites": "Sites",
+      "printers": "Printers",
+      "activeContracts": "Active contracts"
+    },
+    "thisMonth": "Billed this month",
+    "invoicesCount": "{count} invoice(s) generated",
+    "viewInvoices": "View invoices",
+    "usageTrend": {
+      "title": "Usage trend (6 months)",
+      "mono": "Mono",
+      "color": "Color",
+      "empty": "No usage recorded yet."
+    },
+    "recentInvoices": "Recent invoices",
+    "recentCustomers": "Recent customers",
+    "viewAll": "View all",
+    "emptyInvoices": "No invoices yet.",
+    "emptyCustomers": "No customers yet.",
+    "invoiceNumber": "Invoice #",
+    "customer": "Customer",
+    "amount": "Amount",
+    "status": "Status",
+    "name": "Name",
+    "currency": "Currency",
+    "sites": "Sites",
+    "loadError": "Could not load dashboard data."
+  },
+  "Customers": {
+    "title": "Customers",
+    "subtitle": "Manage your rental customers",
+    "createTitle": "New customer",
+    "editTitle": "Edit customer",
+    "formDescription": "Customer billing details and status.",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "currency": "Currency",
+      "status": "Status"
+    },
+    "sitesCount": "Sites",
+    "actions": {
+      "create": "New customer"
+    },
+    "empty": "No customers yet. Create your first one.",
+    "deleteTitle": "Delete customer",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Sites": {
+    "title": "Sites",
+    "subtitle": "Customer locations where printers are installed",
+    "createTitle": "New site",
+    "editTitle": "Edit site",
+    "formDescription": "A site is a physical location under a customer.",
+    "fields": {
+      "customer": "Customer",
+      "name": "Site name",
+      "address": "Address",
+      "city": "City",
+      "phone": "Phone"
+    },
+    "actions": {
+      "create": "New site"
+    },
+    "empty": "No sites yet.",
+    "deleteTitle": "Delete site",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Printers": {
+    "title": "Printers",
+    "subtitle": "Devices being monitored by collector agents",
+    "createTitle": "New printer",
+    "editTitle": "Edit printer",
+    "formDescription": "Network and SNMP details for the printer.",
+    "fields": {
+      "site": "Site",
+      "name": "Printer name",
+      "manufacturer": "Manufacturer",
+      "model": "Model",
+      "serialNumber": "Serial number",
+      "ipAddress": "IP address",
+      "snmpCommunity": "SNMP community",
+      "status": "Status"
+    },
+    "actions": {
+      "create": "New printer"
+    },
+    "empty": "No printers yet.",
+    "deleteTitle": "Delete printer",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Contracts": {
+    "title": "Contracts",
+    "subtitle": "Pricing agreements that drive automated billing",
+    "createTitle": "New contract",
+    "editTitle": "Edit contract",
+    "formDescription": "Monthly fee plus pricing tiers for overage pages.",
+    "fields": {
+      "customer": "Customer",
+      "name": "Contract name",
+      "status": "Status",
+      "monthlyFee": "Monthly fee",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "pricingTiers": "Pricing tiers"
+    },
+    "tierFields": {
+      "name": "Tier name",
+      "currency": "Currency",
+      "includedMono": "Included mono pages",
+      "includedColor": "Included color pages",
+      "monoRate": "Mono rate",
+      "colorRate": "Color rate"
+    },
+    "actions": {
+      "create": "New contract",
+      "addTier": "Add tier",
+      "removeTier": "Remove tier"
+    },
+    "empty": "No contracts yet.",
+    "deleteTitle": "Delete contract",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Invoices": {
+    "title": "Invoices",
+    "subtitle": "Automatically generated invoices from usage",
+    "invoiceNumber": "Invoice #",
+    "customer": "Customer",
+    "period": "Period",
+    "total": "Total",
+    "status": "Status",
+    "month": "Billing month",
+    "actions": {
+      "generate": "Generate invoice"
+    },
+    "generateTitle": "Generate invoice",
+    "generateDescription": "Choose a customer and billing month. An existing invoice for the same period will not be duplicated.",
+    "empty": "No invoices yet. Generate one from a customer's usage.",
+    "backToInvoices": "Back to invoices",
+    "summary": "Summary",
+    "currency": "Currency",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "lines": "Invoice lines",
+    "description": "Description",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "amount": "Amount"
+  },
+  "Usages": {
+    "title": "Usage",
+    "subtitle": "Monthly page counts per printer",
+    "printer": "Printer",
+    "period": "Period",
+    "totalPages": "Total pages",
+    "monoPages": "Mono pages",
+    "colorPages": "Color pages",
+    "filterMonth": "Filter by month",
+    "empty": "No usage recorded yet."
   }
 }

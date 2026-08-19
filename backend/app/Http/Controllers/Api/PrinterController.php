@@ -12,7 +12,7 @@ class PrinterController extends Controller
 {
     public function index()
     {
-        return PrinterResource::collection(Printer::latest()->paginate());
+        return PrinterResource::collection(Printer::latest()->paginate(request()->integer('per_page', 15)));
     }
 
     public function store(StorePrinterRequest $request)

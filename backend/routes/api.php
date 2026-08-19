@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CollectorController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ContractController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\SiteController;
@@ -20,6 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    Route::get('/dashboard', [DashboardController::class, 'summary']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 

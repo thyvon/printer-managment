@@ -12,7 +12,7 @@ class CollectorController extends Controller
 {
     public function index()
     {
-        return CollectorResource::collection(Collector::latest()->paginate());
+        return CollectorResource::collection(Collector::latest()->paginate(request()->integer('per_page', 15)));
     }
 
     public function store(StoreCollectorRequest $request)

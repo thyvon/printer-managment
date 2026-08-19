@@ -13,7 +13,7 @@ class CustomerController extends Controller
     public function index()
     {
         return CustomerResource::collection(
-            Customer::withCount('sites')->latest()->paginate()
+            Customer::withCount('sites')->latest()->paginate(request()->integer('per_page', 15))
         );
     }
 

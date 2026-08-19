@@ -12,7 +12,13 @@ class SiteController extends Controller
 {
     public function index()
     {
-        return SiteResource::collection(Site::latest()->paginate());
+        $query = Site::latest();
+
+        if (request()->has('customer_id')) {
+            $query->where('customer_id', request()->integer('customer_id'));
+        }
+
+        return SiteResource::collection($query->paginate(request()->integer('per_page', 15)));
     }
 
     public function store(StoreSiteRequest $request)

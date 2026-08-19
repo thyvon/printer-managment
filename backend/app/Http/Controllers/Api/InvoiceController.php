@@ -20,7 +20,7 @@ class InvoiceController extends Controller
             $query->where('customer_id', $request->query('customer_id'));
         }
 
-        return InvoiceResource::collection($query->paginate());
+        return InvoiceResource::collection($query->paginate(request()->integer('per_page', 15)));
     }
 
     public function show(Invoice $invoice)

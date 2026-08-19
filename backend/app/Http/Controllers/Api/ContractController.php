@@ -13,7 +13,7 @@ class ContractController extends Controller
     public function index()
     {
         return ContractResource::collection(
-            Contract::with('pricingTiers')->latest()->paginate()
+            Contract::with('pricingTiers')->latest()->paginate(request()->integer('per_page', 15))
         );
     }
 

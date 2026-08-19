@@ -22,6 +22,28 @@ export type User = {
   company?: Company;
 };
 
+export type ServiceTicket = {
+  id: number;
+  customer_id: number;
+  site_id: number | null;
+  printer_id: number | null;
+  title: string;
+  description: string | null;
+  status: "open" | "assigned" | "in_progress" | "resolved" | "closed" | "cancelled";
+  priority: "low" | "medium" | "high" | "urgent";
+  assigned_user_id: number | null;
+  scheduled_at: string | null;
+  started_at: string | null;
+  completed_at: string | null;
+  parts_used: string | null;
+  created_at: string;
+  updated_at: string;
+  customer?: Customer;
+  site?: Site;
+  printer?: Printer;
+  assigned_user?: User;
+};
+
 export type Customer = {
   id: number;
   name: string;

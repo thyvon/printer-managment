@@ -16,6 +16,7 @@
       "sites": "Sites",
       "printers": "Printers",
       "collectors": "Collectors",
+      "maintenance": "Maintenance",
       "contracts": "Contracts",
       "invoices": "Invoices",
       "usages": "Usage"
@@ -291,6 +292,45 @@
     },
     "empty": "No collectors yet.",
     "deleteTitle": "Delete collector",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Maintenance": {
+    "title": "Maintenance",
+    "subtitle": "Service tickets and maintenance history",
+    "createTitle": "New ticket",
+    "editTitle": "Edit ticket",
+    "formDescription": "Create and track service tickets for printer maintenance and repairs.",
+    "fields": {
+      "customer": "Customer",
+      "site": "Site",
+      "printer": "Printer",
+      "title": "Title",
+      "description": "Description",
+      "status": "Status",
+      "priority": "Priority",
+      "assignedUser": "Assigned to",
+      "scheduledAt": "Scheduled for",
+      "partsUsed": "Parts used"
+    },
+    "status": {
+      "open": "Open",
+      "assigned": "Assigned",
+      "in_progress": "In Progress",
+      "resolved": "Resolved",
+      "closed": "Closed",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "actions": {
+      "create": "New ticket"
+    },
+    "empty": "No tickets yet.",
+    "deleteTitle": "Delete ticket",
     "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
   }
 }

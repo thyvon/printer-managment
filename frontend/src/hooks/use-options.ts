@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Customer, Paginated, Site } from "@/lib/types";
+import type { Customer, Paginated, Site, User } from "@/lib/types";
 
 export function useCustomerOptions() {
   return useQuery({
@@ -17,5 +17,13 @@ export function useSiteOptions() {
     queryKey: ["sites", "options"],
     queryFn: () =>
       api.get<Paginated<Site>>("/sites?per_page=100").then((r) => r.data),
+  });
+}
+
+export function useUserOptions() {
+  return useQuery({
+    queryKey: ["users", "options"],
+    queryFn: () =>
+      api.get<Paginated<User>>("/users?per_page=100").then((r) => r.data),
   });
 }

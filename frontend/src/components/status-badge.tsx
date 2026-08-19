@@ -29,6 +29,8 @@ const variants: Record<string, "default" | "secondary" | "destructive" | "outlin
   medium: "secondary",
   high: "destructive",
   urgent: "destructive",
+  low_stock: "destructive",
+  in_stock: "default",
 };
 
 export function StatusBadge({ status }: { status: string }) {

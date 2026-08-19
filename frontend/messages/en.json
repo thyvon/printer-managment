@@ -332,5 +332,39 @@
     "empty": "No tickets yet.",
     "deleteTitle": "Delete ticket",
     "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Toners": {
+    "title": "Toners & Parts",
+    "subtitle": "Consumables inventory and low-stock tracking",
+    "createTitle": "New toner/part",
+    "editTitle": "Edit toner/part",
+    "formDescription": "Manage toner cartridges and printer parts inventory.",
+    "fields": {
+      "name": "Name",
+      "partNumber": "Part number",
+      "color": "Color",
+      "printerModels": "Compatible printer models",
+      "currentStock": "Current stock",
+      "lowStockThreshold": "Low stock threshold",
+      "unit": "Unit",
+      "unitCost": "Unit cost",
+      "supplier": "Supplier",
+      "supplierPartNumber": "Supplier part number",
+      "notes": "Notes"
+    },
+    "colors": {
+      "black": "Black",
+      "cyan": "Cyan",
+      "magenta": "Magenta",
+      "yellow": "Yellow"
+    },
+    "actions": {
+      "create": "New toner/part",
+      "lowStockOnly": "Low stock only",
+      "showAll": "Show all"
+    },
+    "empty": "No toners/parts yet.",
+    "deleteTitle": "Delete toner/part",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
   }
 }

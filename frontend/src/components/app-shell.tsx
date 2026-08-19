@@ -8,6 +8,7 @@ import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  Box,
   Building2,
   ContactRound,
   FileText,
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/printers", key: "printers", icon: Printer },
   { href: "/collectors", key: "collectors", icon: Satellite },
   { href: "/maintenance", key: "maintenance", icon: Hammer },
+  { href: "/toners", key: "toners", icon: Box },
   { href: "/contracts", key: "contracts", icon: FileText },
   { href: "/invoices", key: "invoices", icon: Receipt },
   { href: "/usages", key: "usages", icon: Gauge },

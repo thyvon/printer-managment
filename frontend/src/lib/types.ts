@@ -199,6 +199,24 @@ export type Paginated<T> = {
   };
 };
 
+export type Toner = {
+  id: number;
+  name: string;
+  part_number: string | null;
+  color: "black" | "cyan" | "magenta" | "yellow" | null;
+  printer_models: string | null;
+  current_stock: number;
+  low_stock_threshold: number;
+  unit: string;
+  unit_cost: string | number | null;
+  supplier: string | null;
+  supplier_part_number: string | null;
+  notes: string | null;
+  is_low_stock: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 export type DashboardSummary = {
   counts: {
     customers: number;

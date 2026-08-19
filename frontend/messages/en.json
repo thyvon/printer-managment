@@ -12,8 +12,10 @@
     "nav": {
       "dashboard": "Dashboard",
       "customers": "Customers",
+      "contacts": "Contacts",
       "sites": "Sites",
       "printers": "Printers",
+      "collectors": "Collectors",
       "contracts": "Contracts",
       "invoices": "Invoices",
       "usages": "Usage"
@@ -239,5 +241,56 @@
     "colorPages": "Color pages",
     "filterMonth": "Filter by month",
     "empty": "No usage recorded yet."
+  },
+  "Contacts": {
+    "title": "Contacts",
+    "subtitle": "Contact people at each customer",
+    "createTitle": "New contact",
+    "editTitle": "Edit contact",
+    "formDescription": "A contact person associated with a customer and optional site.",
+    "fields": {
+      "customer": "Customer",
+      "site": "Site",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "role": "Role"
+    },
+    "actions": {
+      "create": "New contact"
+    },
+    "empty": "No contacts yet.",
+    "deleteTitle": "Delete contact",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Collectors": {
+    "title": "Collectors",
+    "subtitle": "On-site agents that gather SNMP counter readings",
+    "createTitle": "New collector",
+    "editTitle": "Edit collector",
+    "formDescription": "A collector agent installed at a site that polls printers and uploads readings.",
+    "fields": {
+      "site": "Site",
+      "name": "Name",
+      "status": "Status",
+      "version": "Version",
+      "lastSeen": "Last seen",
+      "token": "Token"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "unreachable": "Unreachable"
+    },
+    "tokenTitle": "Collector token",
+    "tokenDescription": "Copy this token into the collector's config.yaml to authenticate it. It is only shown once.",
+    "copyToken": "Copy",
+    "tokenCopied": "Token copied",
+    "actions": {
+      "create": "New collector"
+    },
+    "empty": "No collectors yet.",
+    "deleteTitle": "Delete collector",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
   }
 }

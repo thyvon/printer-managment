@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
   Building2,
+  ContactRound,
   FileText,
   Gauge,
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   MapPin,
   Printer,
   Receipt,
+  Satellite,
   Users,
 } from "lucide-react";
 import { useEffect } from "react";
@@ -23,8 +25,10 @@ import { useEffect } from "react";
 const navItems = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
   { href: "/customers", key: "customers", icon: Users },
+  { href: "/contacts", key: "contacts", icon: ContactRound },
   { href: "/sites", key: "sites", icon: MapPin },
   { href: "/printers", key: "printers", icon: Printer },
+  { href: "/collectors", key: "collectors", icon: Satellite },
   { href: "/contracts", key: "contracts", icon: FileText },
   { href: "/invoices", key: "invoices", icon: Receipt },
   { href: "/usages", key: "usages", icon: Gauge },

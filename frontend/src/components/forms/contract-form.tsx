@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray, type Resolver } from "react-hook-form";
+import { useForm, useFieldArray, FormProvider, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/lib/api";
 import type { Contract, Customer } from "@/lib/types";
@@ -16,15 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormField } from "@/components/form-field";
 import { ApiError } from "@/lib/api";
+import { toast } from "sonner";
+import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
+import { FormDatePicker } from "@/components/form-date-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -66,12 +62,7 @@ export function ContractForm({
   const tCommon = useTranslations("Common");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    handleSubmit,
-    control,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: {
       customer_id: customers[0]?.id ?? 0,
@@ -94,13 +85,13 @@ export function ContractForm({
   });
 
   const { fields, append, remove } = useFieldArray({
-    control,
+    control: methods.control,
     name: "pricing_tiers",
   });
 
   useEffect(() => {
     if (open) {
-      reset({
+      methods.reset({
         customer_id: contract?.customer_id ?? customers[0]?.id ?? 0,
         name: contract?.name ?? "",
         status: contract?.status ?? "active",
@@ -129,9 +120,9 @@ export function ContractForm({
               ],
       });
     }
-  }, [open, contract, customers, reset]);
+  }, [open, contract, customers, methods.reset]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = async (values: FormValues) => {
     setServerError(null);
     const payload = {
       ...values,
@@ -145,6 +136,7 @@ export function ContractForm({
       } else {
         await api.post<Contract>("/contracts", payload);
       }
+      toast.success(contract ? t("editTitle") : t("createTitle"));
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -154,7 +146,7 @@ export function ContractForm({
         setServerError(tCommon("errors.generic"));
       }
     }
-  });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -165,24 +157,16 @@ export function ContractForm({
           </DialogTitle>
           <DialogDescription>{t("formDescription")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4">
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="customer_id" label={t("fields.customer")} required>
-              {({ id, value, onChange }) => (
-                <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={String(customer.id)}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+                name="customer_id"
+                label={t("fields.customer")}
+                required
+                options={customers.map((c) => ({ label: c.name, value: String(c.id) }))}
+                placeholder={t("fields.customer")}
+              />
             <FormField name="name" label={t("fields.name")} required>
               {({ id, ...props }) => (
                 <Input id={id} {...props} value={props.value as string} />
@@ -191,21 +175,17 @@ export function ContractForm({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <FormField name="status" label={t("fields.status")} required>
-              {({ id, value, onChange }) => (
-                <Select value={value as string} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">{tCommon("status.active")}</SelectItem>
-                    <SelectItem value="pending">{tCommon("status.pending")}</SelectItem>
-                    <SelectItem value="expired">{tCommon("status.expired")}</SelectItem>
-                    <SelectItem value="cancelled">{tCommon("status.cancelled")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+                name="status"
+                label={t("fields.status")}
+                required
+                options={[
+                  { label: tCommon("status.active"), value: "active" },
+                  { label: tCommon("status.pending"), value: "pending" },
+                  { label: tCommon("status.expired"), value: "expired" },
+                  { label: tCommon("status.cancelled"), value: "cancelled" },
+                ]}
+              />
             <FormField name="monthly_fee" label={t("fields.monthlyFee")}>
               {({ id, ...props }) => (
                 <Input
@@ -217,19 +197,19 @@ export function ContractForm({
                 />
               )}
             </FormField>
-            <FormField name="start_date" label={t("fields.startDate")}>
-              {({ id, ...props }) => (
-                <Input id={id} type="date" {...props} value={props.value as string} />
-              )}
-            </FormField>
+            <FormDatePicker
+                control={methods.control}
+                name="start_date"
+                label={t("fields.startDate")}
+              />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="end_date" label={t("fields.endDate")}>
-              {({ id, ...props }) => (
-                <Input id={id} type="date" {...props} value={props.value as string} />
-              )}
-            </FormField>
+            <FormDatePicker
+                control={methods.control}
+                name="end_date"
+                label={t("fields.endDate")}
+              />
           </div>
 
           <div className="space-y-3">
@@ -269,23 +249,15 @@ export function ContractForm({
                     <Input id={id} {...props} value={props.value as string} />
                   )}
                 </FormField>
-                <FormField
-                  name={`pricing_tiers.${index}.currency`}
-                  label={t("tierFields.currency")}
-                  required
-                >
-                  {({ id, value, onChange }) => (
-                    <Select value={value as string} onValueChange={(v) => onChange(v)}>
-                      <SelectTrigger id={id} className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="USD">USD ($)</SelectItem>
-                        <SelectItem value="KHR">KHR (៛)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  )}
-                </FormField>
+                <FormCombobox
+                    name={`pricing_tiers.${index}.currency`}
+                    label={t("tierFields.currency")}
+                    required
+                    options={[
+                      { label: "USD ($)", value: "USD" },
+                      { label: "KHR (៛)", value: "KHR" },
+                    ]}
+                  />
                 <FormField
                   name={`pricing_tiers.${index}.included_mono_pages`}
                   label={t("tierFields.includedMono")}
@@ -350,11 +322,12 @@ export function ContractForm({
             >
               {tCommon("cancel")}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
+            <Button type="submit" disabled={methods.formState.isSubmitting}>
+              {methods.formState.isSubmitting ? tCommon("saving") : tCommon("save")}
             </Button>
           </DialogFooter>
         </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

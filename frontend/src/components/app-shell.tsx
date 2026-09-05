@@ -8,6 +8,7 @@ import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
+  BarChart3,
   Box,
   Building2,
   ContactRound,
@@ -21,8 +22,9 @@ import {
   Receipt,
   Satellite,
   Users,
+  UserCog,
 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
@@ -36,6 +38,8 @@ const navItems = [
   { href: "/contracts", key: "contracts", icon: FileText },
   { href: "/invoices", key: "invoices", icon: Receipt },
   { href: "/usages", key: "usages", icon: Gauge },
+  { href: "/reports", key: "reports", icon: BarChart3 },
+  { href: "/users", key: "users", icon: UserCog },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -43,6 +47,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { status, company, user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -50,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
   }, [status, router]);
 
-  if (status === "loading") {
+  if (!mounted || status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <PageLoading />
@@ -141,7 +151,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
-        <main className="mx-auto w-full max-w-6xl flex-1 p-4 sm:p-6">{children}</main>
+        <main className="flex-1 p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

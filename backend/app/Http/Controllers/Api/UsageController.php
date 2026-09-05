@@ -13,10 +13,14 @@ class UsageController extends Controller
     public function index(Request $request)
     {
         $month = $request->query('month');
+        $from = $request->query('from');
+        $to = $request->query('to');
 
         $query = Usage::with('printer');
 
-        if ($month) {
+        if ($from && $to) {
+            $query->whereBetween('period_start', [$from, $to]);
+        } elseif ($month) {
             $query->whereBetween('period_start', [Carbon::parse($month.'-01')->startOfMonth(), Carbon::parse($month.'-01')->endOfMonth()]);
         }
 

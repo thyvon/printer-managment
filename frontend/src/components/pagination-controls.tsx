@@ -39,7 +39,10 @@ export function PaginationControls<T>({
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                if (current > 1) setPage(current - 1);
+                if (current > 1) {
+                  setPage(current - 1);
+                  window.scrollTo({ top: 0 });
+                }
               }}
               text={t("previous")}
               className={current <= 1 ? "pointer-events-none opacity-50" : ""}
@@ -57,6 +60,7 @@ export function PaginationControls<T>({
                   onClick={(e) => {
                     e.preventDefault();
                     setPage(p);
+                    window.scrollTo({ top: 0 });
                   }}
                   isActive={p === current}
                 >
@@ -69,7 +73,10 @@ export function PaginationControls<T>({
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                if (current < last) setPage(current + 1);
+                if (current < last) {
+                  setPage(current + 1);
+                  window.scrollTo({ top: 0 });
+                }
               }}
               text={t("next")}
               className={current >= last ? "pointer-events-none opacity-50" : ""}

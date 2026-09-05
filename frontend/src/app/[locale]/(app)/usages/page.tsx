@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import type { DateRange } from "react-day-picker";
 import { api } from "@/lib/api";
 import type { Paginated, Usage } from "@/lib/types";
 import { PageHeader } from "@/components/page-header";
@@ -16,20 +17,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Input } from "@/components/ui/input";
 import { PaginationControls } from "@/components/pagination-controls";
+import { DateRangePicker } from "@/components/date-range-picker";
+import { fmtPeriod } from "@/lib/dates";
 
 export default function UsagesPage() {
   const t = useTranslations("Usages");
   const tCommon = useTranslations("Common");
   const [page, setPage] = useState(1);
-  const [month, setMonth] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+
+  const dateParams =
+    dateRange?.from && dateRange?.to
+      ? `&from=${dateRange.from.toISOString()}&to=${dateRange.to.toISOString()}`
+      : "";
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["usages", page, month],
+    queryKey: ["usages", page, dateParams],
     queryFn: () =>
       api.get<Paginated<Usage>>(
-        `/usages?page=${page}${month ? `&month=${month}` : ""}`
+        `/usages?page=${page}${dateParams}`
       ),
   });
 
@@ -52,16 +59,13 @@ export default function UsagesPage() {
         title={t("title")}
         description={t("subtitle")}
         actions={
-          <Input
-            type="month"
-            className="w-40"
-            value={month}
-            onChange={(e) => {
-              setMonth(e.target.value);
+          <DateRangePicker
+            range={dateRange}
+            onChange={(r) => {
+              setDateRange(r);
               setPage(1);
             }}
-            placeholder={t("filterMonth")}
-            aria-label={t("filterMonth")}
+            label={t("filterMonth")}
           />
         }
       />
@@ -88,7 +92,7 @@ export default function UsagesPage() {
                   <TableRow key={usage.id}>
                     <TableCell className="font-medium">{printerName(usage)}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {usage.period_start} — {usage.period_end}
+                      {fmtPeriod(usage.period_start, usage.period_end)}
                     </TableCell>
                     <TableCell>{usage.total_pages.toLocaleString()}</TableCell>
                     <TableCell>{usage.mono_pages.toLocaleString()}</TableCell>

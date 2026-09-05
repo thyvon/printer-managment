@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, type Resolver } from "react-hook-form";
+import { useForm, FormProvider, type Resolver } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/lib/api";
 import type { Toner } from "@/lib/types";
@@ -17,15 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormField } from "@/components/form-field";
 import { ApiError } from "@/lib/api";
+import { toast } from "sonner";
+import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
@@ -59,11 +54,7 @@ export function TonerForm({
   const tCommon = useTranslations("Common");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: {
       name: "",
@@ -82,7 +73,7 @@ export function TonerForm({
 
   useEffect(() => {
     if (open) {
-      reset({
+      methods.reset({
         name: toner?.name ?? "",
         part_number: toner?.part_number ?? "",
         color: (toner?.color as FormValues["color"]) ?? "black",
@@ -96,9 +87,9 @@ export function TonerForm({
         notes: toner?.notes ?? "",
       });
     }
-  }, [open, toner, reset]);
+  }, [open, toner, methods.reset]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = async (values: FormValues) => {
     setServerError(null);
     const payload = {
       ...values,
@@ -115,6 +106,7 @@ export function TonerForm({
       } else {
         await api.post<Toner>("/toners", payload);
       }
+      toast.success(toner ? t("editTitle") : t("createTitle"));
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -124,7 +116,7 @@ export function TonerForm({
         setServerError(tCommon("errors.generic"));
       }
     }
-  });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -133,7 +125,8 @@ export function TonerForm({
           <DialogTitle>{toner ? t("editTitle") : t("createTitle")}</DialogTitle>
           <DialogDescription>{t("formDescription")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4">
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
           <FormField name="name" label={t("fields.name")} required>
             {({ id, ...props }) => (
               <Input id={id} {...props} value={props.value as string} />
@@ -147,22 +140,17 @@ export function TonerForm({
               )}
             </FormField>
 
-            <FormField name="color" label={t("fields.color")}>
-              {({ id, value, onChange }) => (
-                <Select value={value as string} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue placeholder={t("fields.color")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(["black", "cyan", "magenta", "yellow"] as const).map((c) => (
-                      <SelectItem key={c} value={c}>
-                        {t(`colors.${c}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="color"
+              label={t("fields.color")}
+              options={([
+                { label: t("colors.black"), value: "black" },
+                { label: t("colors.cyan"), value: "cyan" },
+                { label: t("colors.magenta"), value: "magenta" },
+                { label: t("colors.yellow"), value: "yellow" },
+              ])}
+              placeholder={t("fields.color")}
+            />
           </div>
 
           <FormField name="printer_models" label={t("fields.printerModels")}>
@@ -231,11 +219,12 @@ export function TonerForm({
             >
               {tCommon("cancel")}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
+            <Button type="submit" disabled={methods.formState.isSubmitting}>
+              {methods.formState.isSubmitting ? tCommon("saving") : tCommon("save")}
             </Button>
           </DialogFooter>
         </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

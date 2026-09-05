@@ -5,9 +5,9 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { api, ApiError } from "@/lib/api";
-import type { Customer, Invoice, Paginated } from "@/lib/types";
+import type { Invoice, Paginated } from "@/lib/types";
 import { PageHeader } from "@/components/page-header";
 import { PageLoading } from "@/components/loading";
 import { StatusBadge } from "@/components/status-badge";
@@ -30,18 +30,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
 import { PaginationControls } from "@/components/pagination-controls";
 import { useCustomerOptions } from "@/hooks/use-options";
-import { Link } from "@/i18n/navigation";
 import { Plus } from "lucide-react";
+import { fmtPeriod } from "@/lib/dates";
 
 const generateSchema = z.object({
   customer_id: z.number().min(1),
@@ -73,11 +67,7 @@ export default function InvoicesPage() {
     queryFn: () => api.get<Paginated<Invoice>>(`/invoices?page=${page}`),
   });
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<GenerateValues>({
+  const methods = useForm<GenerateValues>({
     resolver: zodResolver(generateSchema),
     defaultValues: {
       customer_id: 0,
@@ -103,10 +93,10 @@ export default function InvoicesPage() {
     },
   });
 
-  const onGenerate = handleSubmit((values) => {
+  const onGenerate = async (values: GenerateValues) => {
     setServerError(null);
     generateMutation.mutate(values);
-  });
+  };
 
   if (isLoading || customersQuery.isLoading) return <PageLoading />;
 
@@ -129,7 +119,7 @@ export default function InvoicesPage() {
         actions={
           <Button
             onClick={() => {
-              reset({ customer_id: customersQuery.data?.[0]?.id ?? 0, month: "" });
+              methods.reset({ customer_id: customersQuery.data?.[0]?.id ?? 0, month: "" });
               setServerError(null);
               setGenerateOpen(true);
             }}
@@ -161,18 +151,13 @@ export default function InvoicesPage() {
                 {data.data.map((invoice) => (
                   <TableRow key={invoice.id}>
                     <TableCell className="font-medium">
-                      <Link
-                        href={`/invoices/${invoice.id}`}
-                        className="hover:underline"
-                      >
-                        {invoice.invoice_number}
-                      </Link>
+                      {invoice.invoice_number}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {invoice.customer?.name ?? customerName(invoice.customer_id)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {invoice.period_start} — {invoice.period_end}
+                      {fmtPeriod(invoice.period_start, invoice.period_end)}
                     </TableCell>
                     <TableCell>
                       {formatMoney(invoice.total, invoice.currency)}
@@ -196,58 +181,51 @@ export default function InvoicesPage() {
             <DialogTitle>{t("generateTitle")}</DialogTitle>
             <DialogDescription>{t("generateDescription")}</DialogDescription>
           </DialogHeader>
-          <form onSubmit={onGenerate} className="grid gap-4">
-            <FormField name="customer_id" label={t("customer")} required>
-              {({ id, value, onChange }) => (
-                <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customersQuery.data?.map((customer: Customer) => (
-                      <SelectItem key={customer.id} value={String(customer.id)}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
-            <FormField name="month" label={t("month")} required>
-              {({ id, ...props }) => (
-                <Input
-                  id={id}
-                  type="month"
-                  {...props}
-                  value={props.value as string}
-                />
-              )}
-            </FormField>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onGenerate)} className="grid gap-4">
+              <FormCombobox
+                name="customer_id"
+                label={t("customer")}
+                required
+                options={(customersQuery.data ?? []).map((c) => ({ label: c.name, value: String(c.id) }))}
+                placeholder={t("customer")}
+              />
+              <FormField name="month" label={t("month")} required>
+                {({ id, ...props }) => (
+                  <Input
+                    id={id}
+                    type="month"
+                    {...props}
+                    value={props.value as string}
+                  />
+                )}
+              </FormField>
 
-            {serverError ? (
-              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                {serverError}
-              </p>
-            ) : null}
+              {serverError ? (
+                <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {serverError}
+                </p>
+              ) : null}
 
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setGenerateOpen(false)}
-              >
-                {tCommon("cancel")}
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting || generateMutation.isPending}
-              >
-                {isSubmitting || generateMutation.isPending
-                  ? tCommon("saving")
-                  : t("actions.generate")}
-              </Button>
-            </DialogFooter>
-          </form>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setGenerateOpen(false)}
+                >
+                  {tCommon("cancel")}
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={methods.formState.isSubmitting || generateMutation.isPending}
+                >
+                  {methods.formState.isSubmitting || generateMutation.isPending
+                    ? tCommon("saving")
+                    : t("actions.generate")}
+                </Button>
+              </DialogFooter>
+            </form>
+          </FormProvider>
         </DialogContent>
       </Dialog>
     </div>

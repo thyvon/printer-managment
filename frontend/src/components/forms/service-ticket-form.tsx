@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/lib/api";
 import type { Customer, Printer, ServiceTicket, Site, User } from "@/lib/types";
@@ -17,15 +17,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormField } from "@/components/form-field";
 import { ApiError } from "@/lib/api";
+import { toast } from "sonner";
+import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
+import { FormDatePicker } from "@/components/form-date-picker";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
@@ -68,11 +64,7 @@ export function ServiceTicketForm({
   const tCommon = useTranslations("Common");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       customer_id: defaultCustomerId ?? customers[0]?.id ?? 0,
@@ -90,7 +82,7 @@ export function ServiceTicketForm({
 
   useEffect(() => {
     if (open) {
-      reset({
+      methods.reset({
         customer_id: ticket?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? 0,
         site_id: String(ticket?.site_id ?? ""),
         printer_id: String(ticket?.printer_id ?? ""),
@@ -103,9 +95,9 @@ export function ServiceTicketForm({
         parts_used: ticket?.parts_used ?? "",
       });
     }
-  }, [open, ticket, defaultCustomerId, customers, reset]);
+  }, [open, ticket, defaultCustomerId, customers, methods.reset]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = async (values: FormValues) => {
     setServerError(null);
     const payload = {
       ...values,
@@ -122,6 +114,7 @@ export function ServiceTicketForm({
       } else {
         await api.post<ServiceTicket>("/service-tickets", payload);
       }
+      toast.success(ticket ? t("editTitle") : t("createTitle"));
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -131,7 +124,7 @@ export function ServiceTicketForm({
         setServerError(tCommon("errors.generic"));
       }
     }
-  });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -140,58 +133,30 @@ export function ServiceTicketForm({
           <DialogTitle>{ticket ? t("editTitle") : t("createTitle")}</DialogTitle>
           <DialogDescription>{t("formDescription")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4">
-          <FormField name="customer_id" label={t("fields.customer")} required>
-            {({ id, value, onChange }) => (
-              <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-                <SelectTrigger id={id} className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={String(customer.id)}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </FormField>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
+          <FormCombobox
+              name="customer_id"
+              label={t("fields.customer")}
+              required
+              options={customers.map((c) => ({ label: c.name, value: String(c.id) }))}
+              placeholder={t("fields.customer")}
+            />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="site_id" label={t("fields.site")}>
-              {({ id, value, onChange }) => (
-                <Select value={value} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue placeholder={t("fields.site")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sites.map((site) => (
-                      <SelectItem key={site.id} value={String(site.id)}>
-                        {site.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="site_id"
+              label={t("fields.site")}
+              options={sites.map((s) => ({ label: s.name, value: String(s.id) }))}
+              placeholder={t("fields.site")}
+            />
 
-            <FormField name="printer_id" label={t("fields.printer")}>
-              {({ id, value, onChange }) => (
-                <Select value={value} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue placeholder={t("fields.printer")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {printers.map((printer) => (
-                      <SelectItem key={printer.id} value={String(printer.id)}>
-                        {printer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="printer_id"
+              label={t("fields.printer")}
+              options={printers.map((p) => ({ label: p.name, value: String(p.id) }))}
+              placeholder={t("fields.printer")}
+            />
           </div>
 
           <FormField name="title" label={t("fields.title")} required>
@@ -207,64 +172,44 @@ export function ServiceTicketForm({
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            <FormField name="status" label={t("fields.status")}>
-              {({ id, value, onChange }) => (
-                <Select value={value} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(["open", "assigned", "in_progress", "resolved", "closed", "cancelled"] as const).map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {t(`status.${s}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="status"
+              label={t("fields.status")}
+              options={([
+                { label: t("status.open"), value: "open" },
+                { label: t("status.assigned"), value: "assigned" },
+                { label: t("status.in_progress"), value: "in_progress" },
+                { label: t("status.resolved"), value: "resolved" },
+                { label: t("status.closed"), value: "closed" },
+                { label: t("status.cancelled"), value: "cancelled" },
+              ])}
+            />
 
-            <FormField name="priority" label={t("fields.priority")}>
-              {({ id, value, onChange }) => (
-                <Select value={value} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(["low", "medium", "high", "urgent"] as const).map((p) => (
-                      <SelectItem key={p} value={p}>
-                        {t(`priority.${p}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="priority"
+              label={t("fields.priority")}
+              options={([
+                { label: t("priority.low"), value: "low" },
+                { label: t("priority.medium"), value: "medium" },
+                { label: t("priority.high"), value: "high" },
+                { label: t("priority.urgent"), value: "urgent" },
+              ])}
+            />
 
-            <FormField name="assigned_user_id" label={t("fields.assignedUser")}>
-              {({ id, value, onChange }) => (
-                <Select value={value} onValueChange={(v) => onChange(v)}>
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue placeholder={t("fields.assignedUser")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={String(user.id)}>
-                        {user.name} ({user.email})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
+            <FormCombobox
+              name="assigned_user_id"
+              label={t("fields.assignedUser")}
+              options={users.map((u) => ({ label: `${u.name} (${u.email})`, value: String(u.id) }))}
+              placeholder={t("fields.assignedUser")}
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="scheduled_at" label={t("fields.scheduledAt")}>
-              {({ id, ...props }) => (
-                <Input id={id} type="datetime-local" {...props} value={props.value as string} />
-              )}
-            </FormField>
+            <FormDatePicker
+                control={methods.control}
+                name="scheduled_at"
+                label={t("fields.scheduledAt")}
+              />
 
             <FormField name="parts_used" label={t("fields.partsUsed")}>
               {({ id, ...props }) => (
@@ -287,11 +232,12 @@ export function ServiceTicketForm({
             >
               {tCommon("cancel")}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
+            <Button type="submit" disabled={methods.formState.isSubmitting}>
+              {methods.formState.isSubmitting ? tCommon("saving") : tCommon("save")}
             </Button>
           </DialogFooter>
         </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

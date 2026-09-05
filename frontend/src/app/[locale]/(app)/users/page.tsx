@@ -4,10 +4,9 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Contract, Paginated } from "@/lib/types";
+import type { Paginated, User } from "@/lib/types";
 import { PageHeader } from "@/components/page-header";
 import { PageLoading } from "@/components/loading";
-import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -20,38 +19,35 @@ import {
 } from "@/components/ui/table";
 import { PaginationControls } from "@/components/pagination-controls";
 import { ConfirmDialog } from "@/components/confirm-dialog";
-import { ContractForm } from "@/components/forms/contract-form";
-import { useCustomerOptions } from "@/hooks/use-options";
+import { StatusBadge } from "@/components/status-badge";
+import { UserForm } from "@/components/forms/user-form";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 
-export default function ContractsPage() {
-  const t = useTranslations("Contracts");
+export default function UsersPage() {
+  const t = useTranslations("Users");
   const tCommon = useTranslations("Common");
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Contract | null>(null);
-  const [deleting, setDeleting] = useState<Contract | null>(null);
-
-  const customersQuery = useCustomerOptions();
+  const [editing, setEditing] = useState<User | null>(null);
+  const [deleting, setDeleting] = useState<User | null>(null);
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["contracts", page],
-    queryFn: () => api.get<Paginated<Contract>>(`/contracts?page=${page}`),
+    queryKey: ["users", page],
+    queryFn: () => api.get<Paginated<User>>(`/users?page=${page}`),
   });
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["contracts"] });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["users"] });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => api.delete(`/contracts/${id}`),
+    mutationFn: (id: number) => api.delete(`/users/${id}`),
     onSuccess: () => {
       setDeleting(null);
       invalidate();
     },
   });
 
-  if (isLoading || customersQuery.isLoading) return <PageLoading />;
+  if (isLoading) return <PageLoading />;
 
   if (isError || !data) {
     return (
@@ -60,9 +56,6 @@ export default function ContractsPage() {
       </p>
     );
   }
-
-  const customerName = (id: number) =>
-    customersQuery.data?.find((c) => c.id === id)?.name ?? `#${id}`;
 
   return (
     <div className="space-y-6">
@@ -93,28 +86,28 @@ export default function ContractsPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("fields.name")}</TableHead>
-                  <TableHead>{t("fields.customer")}</TableHead>
-                  <TableHead>{t("fields.monthlyFee")}</TableHead>
-                  <TableHead>{t("fields.status")}</TableHead>
+                  <TableHead>{t("fields.email")}</TableHead>
+                  <TableHead>{t("fields.role")}</TableHead>
+                  <TableHead>{t("fields.joined")}</TableHead>
                   <TableHead className="text-right">{tCommon("actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.data.map((contract) => (
-                  <TableRow key={contract.id}>
-                    <TableCell className="font-medium">{contract.name}</TableCell>
+                {data.data.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {customerName(contract.customer_id)}
+                      {user.email}
                     </TableCell>
                     <TableCell>
-                      {contract.monthly_fee !== null ? (() => {
-                        const currency = contract.pricing_tiers?.[0]?.currency ?? "USD";
-                        const symbol = currency === "KHR" ? "៛" : "$";
-                        return `${symbol}${Number(contract.monthly_fee).toFixed(2)}`;
-                      })() : "-"}
+                      <StatusBadge status={user.role} />
                     </TableCell>
-                    <TableCell>
-                      <StatusBadge status={contract.status} />
+                    <TableCell className="text-muted-foreground">
+                      {new Date(user.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-1">
@@ -123,7 +116,7 @@ export default function ContractsPage() {
                           size="icon-sm"
                           aria-label={tCommon("edit")}
                           onClick={() => {
-                            setEditing(contract);
+                            setEditing(user);
                             setFormOpen(true);
                           }}
                         >
@@ -134,7 +127,7 @@ export default function ContractsPage() {
                           size="icon-sm"
                           aria-label={tCommon("delete")}
                           className="text-destructive hover:text-destructive"
-                          onClick={() => setDeleting(contract)}
+                          onClick={() => setDeleting(user)}
                         >
                           <Trash2 />
                         </Button>
@@ -150,11 +143,10 @@ export default function ContractsPage() {
 
       <PaginationControls setPage={setPage} data={data} />
 
-      <ContractForm
+      <UserForm
         open={formOpen}
         onOpenChange={setFormOpen}
-        contract={editing}
-        customers={customersQuery.data ?? []}
+        user={editing}
         onSuccess={invalidate}
       />
 

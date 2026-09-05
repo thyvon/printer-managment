@@ -21,7 +21,7 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { StatusBadge } from "@/components/status-badge";
 import { ServiceTicketForm } from "@/components/forms/service-ticket-form";
-import { useCustomerOptions, useSiteOptions, useUserOptions } from "@/hooks/use-options";
+import { useCustomerOptions, useSiteOptions, usePrinterOptions, useUserOptions } from "@/hooks/use-options";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
@@ -39,6 +39,7 @@ export default function MaintenancePage() {
 
   const customersQuery = useCustomerOptions();
   const sitesQuery = useSiteOptions();
+  const printersQuery = usePrinterOptions();
   const usersQuery = useUserOptions();
 
   const { data, isLoading, isError } = useQuery({
@@ -59,7 +60,7 @@ export default function MaintenancePage() {
     },
   });
 
-  if (isLoading || customersQuery.isLoading || sitesQuery.isLoading || usersQuery.isLoading)
+  if (isLoading || customersQuery.isLoading || sitesQuery.isLoading || printersQuery.isLoading || usersQuery.isLoading)
     return <PageLoading />;
 
   if (isError || !data) {
@@ -81,7 +82,7 @@ export default function MaintenancePage() {
   const printerName = (id: number | null) =>
     id == null
       ? "-"
-      : data.data.flatMap((t) => t.printer ? [t.printer] : []).find((p) => p.id === id)?.name ?? `#${id}`;
+      : printersQuery.data?.find((p) => p.id === id)?.name ?? `#${id}`;
 
   const userName = (id: number | null) =>
     id == null

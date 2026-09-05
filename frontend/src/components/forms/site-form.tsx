@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/lib/api";
 import type { Customer, Site } from "@/lib/types";
@@ -16,15 +16,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { FormField } from "@/components/form-field";
 import { ApiError } from "@/lib/api";
+import { toast } from "sonner";
+import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
@@ -56,11 +51,7 @@ export function SiteForm({
   const tCommon = useTranslations("Common");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       customer_id: defaultCustomerId ?? customers[0]?.id ?? 0,
@@ -73,7 +64,7 @@ export function SiteForm({
 
   useEffect(() => {
     if (open) {
-      reset({
+      methods.reset({
         customer_id: site?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? 0,
         name: site?.name ?? "",
         address: site?.address ?? "",
@@ -81,9 +72,9 @@ export function SiteForm({
         phone: site?.phone ?? "",
       });
     }
-  }, [open, site, defaultCustomerId, customers, reset]);
+  }, [open, site, defaultCustomerId, customers, methods.reset]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = async (values: FormValues) => {
     setServerError(null);
     const payload = {
       ...values,
@@ -97,6 +88,7 @@ export function SiteForm({
       } else {
         await api.post<Site>("/sites", payload);
       }
+      toast.success(site ? t("editTitle") : t("createTitle"));
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -106,7 +98,7 @@ export function SiteForm({
         setServerError(tCommon("errors.generic"));
       }
     }
-  });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,23 +107,15 @@ export function SiteForm({
           <DialogTitle>{site ? t("editTitle") : t("createTitle")}</DialogTitle>
           <DialogDescription>{t("formDescription")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4">
-          <FormField name="customer_id" label={t("fields.customer")} required>
-            {({ id, value, onChange }) => (
-              <Select value={String(value)} onValueChange={(v) => onChange(Number(v))}>
-                <SelectTrigger id={id} className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map((customer) => (
-                    <SelectItem key={customer.id} value={String(customer.id)}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          </FormField>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
+          <FormCombobox
+              name="customer_id"
+              label={t("fields.customer")}
+              required
+              options={customers.map((c) => ({ label: c.name, value: String(c.id) }))}
+              placeholder={t("fields.customer")}
+            />
 
           <FormField name="name" label={t("fields.name")} required>
             {({ id, ...props }) => (
@@ -172,11 +156,12 @@ export function SiteForm({
             >
               {tCommon("cancel")}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
+            <Button type="submit" disabled={methods.formState.isSubmitting}>
+              {methods.formState.isSubmitting ? tCommon("saving") : tCommon("save")}
             </Button>
           </DialogFooter>
         </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

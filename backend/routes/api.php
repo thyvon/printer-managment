@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PrinterController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ServiceTicketController;
 use App\Http\Controllers\Api\SiteController;
 use App\Http\Controllers\Api\TonerController;
@@ -27,6 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'summary']);
 
+    Route::prefix('reports')->group(function () {
+        Route::get('/usage', [ReportController::class, 'usage']);
+        Route::get('/revenue', [ReportController::class, 'revenue']);
+        Route::get('/fleet', [ReportController::class, 'fleet']);
+    });
+
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('customers', CustomerController::class);
@@ -35,7 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('printers', PrinterController::class);
     Route::apiResource('contracts', ContractController::class);
     Route::apiResource('collectors', CollectorController::class);
-    Route::apiResource('users', UserController::class)->only(['index']);
+    Route::apiResource('users', UserController::class)->except(['create', 'edit']);
     Route::apiResource('service-tickets', ServiceTicketController::class);
     Route::apiResource('toners', TonerController::class);
     Route::get('usages', [UsageController::class, 'index']);

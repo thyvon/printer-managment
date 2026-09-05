@@ -146,10 +146,7 @@ export default function CustomersPage() {
       </Card>
 
       <PaginationControls
-        setPage={(p) => {
-          setPage(p);
-          window.scrollTo({ top: 0 });
-        }}
+        setPage={setPage}
         data={data}
       />
 

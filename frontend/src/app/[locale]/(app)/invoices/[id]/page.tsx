@@ -21,6 +21,7 @@ import {
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fmtPeriod } from "@/lib/dates";
 
 function formatMoney(amount: number, currency: string) {
   const symbol = currency === "KHR" ? "៛" : "$";
@@ -80,7 +81,7 @@ export default function InvoiceDetailPage({
           <div>
             <p className="text-xs text-muted-foreground">{t("period")}</p>
             <p className="text-sm font-medium">
-              {data.period_start} — {data.period_end}
+              {fmtPeriod(data.period_start, data.period_end)}
             </p>
           </div>
           <div>

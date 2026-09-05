@@ -17,9 +17,12 @@
       "printers": "Printers",
       "collectors": "Collectors",
       "maintenance": "Maintenance",
+      "toners": "Toners",
       "contracts": "Contracts",
       "invoices": "Invoices",
-      "usages": "Usage"
+      "usages": "Usage",
+      "reports": "Reports",
+      "users": "Users"
     },
     "logout": "Log out"
   },
@@ -75,7 +78,8 @@
     "errors": {
       "generic": "Something went wrong. Please try again.",
       "load": "Could not load data. Please try again."
-    }
+    },
+    "noResults": "No results found."
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -243,6 +247,73 @@
     "filterMonth": "Filter by month",
     "empty": "No usage recorded yet."
   },
+  "Reports": {
+    "title": "Reports",
+    "subtitle": "Usage, revenue, and fleet analytics",
+    "tabs": {
+      "usage": "Usage",
+      "revenue": "Revenue",
+      "fleet": "Fleet"
+    },
+    "totalPages": "Total Pages",
+    "monoPages": "Mono Pages",
+    "colorPages": "Color Pages",
+    "avgPagesPerPrinter": "Avg Pages / Printer",
+    "usageTrend": "Usage Trend",
+    "usageDetails": "Usage Details",
+    "period": "Period",
+    "printers": "Printers",
+    "revenueUSD": "Revenue (USD)",
+    "revenueKHR": "Revenue (KHR)",
+    "totalInvoices": "Total Invoices",
+    "overdueInvoices": "Overdue Invoices",
+    "revenueTrend": "Revenue Trend",
+    "revenueDetails": "Revenue Details",
+    "currency": "Currency",
+    "total": "Total",
+    "invoices": "Invoices",
+    "paid": "Paid",
+    "overdue": "Overdue",
+    "totalPrinters": "Total Printers",
+    "openTickets": "Open Tickets",
+    "lowStockToners": "Low Stock Toners",
+    "manufacturers": "Manufacturers",
+    "printersByStatus": "Printers by Status",
+    "printersByManufacturer": "Printers by Manufacturer",
+    "printersByCustomer": "Printers by Customer",
+    "topSites": "Top Sites",
+    "customer": "Customer",
+    "site": "Site",
+    "city": "City",
+    "allTime": "All time"
+  },
+  "Users": {
+    "title": "Users",
+    "subtitle": "Manage team members and their roles",
+    "createTitle": "New user",
+    "editTitle": "Edit user",
+    "deleteTitle": "Delete user",
+    "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone.",
+    "formDescription": "Create or edit a user account.",
+    "empty": "No users found.",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "newPassword": "New Password",
+      "passwordConfirmation": "Confirm Password",
+      "role": "Role",
+      "joined": "Joined"
+    },
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "staff": "Staff"
+    },
+    "actions": {
+      "create": "New user"
+    }
+  },
   "Contacts": {
     "title": "Contacts",
     "subtitle": "Contact people at each customer",
@@ -350,7 +421,8 @@
       "unitCost": "Unit cost",
       "supplier": "Supplier",
       "supplierPartNumber": "Supplier part number",
-      "notes": "Notes"
+      "notes": "Notes",
+      "status": "Status"
     },
     "colors": {
       "black": "Black",

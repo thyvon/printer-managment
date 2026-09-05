@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { api } from "@/lib/api";
 import type { Customer } from "@/lib/types";
@@ -17,15 +17,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FormField } from "@/components/form-field";
+import { FormCombobox } from "@/components/form-combobox";
 import { ApiError } from "@/lib/api";
+import { toast } from "sonner";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
@@ -54,11 +49,7 @@ export function CustomerForm({
   const tCommon = useTranslations("Common");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const {
-    handleSubmit,
-    reset,
-    formState: { isSubmitting },
-  } = useForm<FormValues>({
+  const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
@@ -72,7 +63,7 @@ export function CustomerForm({
 
   useEffect(() => {
     if (open) {
-      reset({
+      methods.reset({
         name: customer?.name ?? "",
         email: customer?.email ?? "",
         phone: customer?.phone ?? "",
@@ -81,9 +72,9 @@ export function CustomerForm({
         status: customer?.status ?? "active",
       });
     }
-  }, [open, customer, reset]);
+  }, [open, customer, methods.reset]);
 
-  const onSubmit = handleSubmit(async (values) => {
+  const onSubmit = async (values: FormValues) => {
     setServerError(null);
     const payload = {
       ...values,
@@ -97,6 +88,7 @@ export function CustomerForm({
       } else {
         await api.post<Customer>("/customers", payload);
       }
+      toast.success(customer ? t("editTitle") : t("createTitle"));
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
@@ -106,7 +98,7 @@ export function CustomerForm({
         setServerError(tCommon("errors.generic"));
       }
     }
-  });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -117,86 +109,74 @@ export function CustomerForm({
           </DialogTitle>
           <DialogDescription>{t("formDescription")}</DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} className="grid gap-4">
-          <FormField name="name" label={t("fields.name")} required>
-            {({ id, ...props }) => (
-              <Input id={id} {...props} value={props.value as string} />
-            )}
-          </FormField>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="email" label={t("fields.email")}>
-              {({ id, ...props }) => (
-                <Input id={id} type="email" {...props} value={props.value as string} />
-              )}
-            </FormField>
-            <FormField name="phone" label={t("fields.phone")}>
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="grid gap-4">
+            <FormField name="name" label={t("fields.name")} required>
               {({ id, ...props }) => (
                 <Input id={id} {...props} value={props.value as string} />
               )}
             </FormField>
-          </div>
 
-          <FormField name="address" label={t("fields.address")}>
-            {({ id, ...props }) => (
-              <Textarea id={id} {...props} value={props.value as string} />
-            )}
-          </FormField>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField name="email" label={t("fields.email")}>
+                {({ id, ...props }) => (
+                  <Input id={id} type="email" {...props} value={props.value as string} />
+                )}
+              </FormField>
+              <FormField name="phone" label={t("fields.phone")}>
+                {({ id, ...props }) => (
+                  <Input id={id} {...props} value={props.value as string} />
+                )}
+              </FormField>
+            </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField name="currency" label={t("fields.currency")} required>
-              {({ id, value, onChange }) => (
-                <Select
-                  value={value as string}
-                  onValueChange={(v) => onChange(v)}
-                >
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD ($)</SelectItem>
-                    <SelectItem value="KHR">KHR (៛)</SelectItem>
-                  </SelectContent>
-                </Select>
+            <FormField name="address" label={t("fields.address")}>
+              {({ id, ...props }) => (
+                <Textarea id={id} {...props} value={props.value as string} />
               )}
             </FormField>
-            <FormField name="status" label={t("fields.status")} required>
-              {({ id, value, onChange }) => (
-                <Select
-                  value={value as string}
-                  onValueChange={(v) => onChange(v)}
-                >
-                  <SelectTrigger id={id} className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">{tCommon("status.active")}</SelectItem>
-                    <SelectItem value="inactive">{tCommon("status.inactive")}</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            </FormField>
-          </div>
 
-          {serverError ? (
-            <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
-              {serverError}
-            </p>
-          ) : null}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormCombobox
+                name="currency"
+                label={t("fields.currency")}
+                required
+                options={[
+                  { label: "USD ($)", value: "USD" },
+                  { label: "KHR (៛)", value: "KHR" },
+                ]}
+              />
+              <FormCombobox
+                name="status"
+                label={t("fields.status")}
+                required
+                options={[
+                  { label: tCommon("status.active"), value: "active" },
+                  { label: tCommon("status.inactive"), value: "inactive" },
+                ]}
+              />
+            </div>
 
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              {tCommon("cancel")}
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? tCommon("saving") : tCommon("save")}
-            </Button>
-          </DialogFooter>
-        </form>
+            {serverError ? (
+              <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {serverError}
+              </p>
+            ) : null}
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                {tCommon("cancel")}
+              </Button>
+              <Button type="submit" disabled={methods.formState.isSubmitting}>
+                {methods.formState.isSubmitting ? tCommon("saving") : tCommon("save")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import type { DashboardSummary } from "@/lib/types";
@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
+import { fmtPeriod } from "@/lib/dates";
 import {
   Bar,
   BarChart,
@@ -35,9 +36,9 @@ import {
   Users,
 } from "lucide-react";
 
-function formatMoney(amount: number, currency: string, locale: string) {
+function formatMoney(amount: number, currency: string) {
   const symbol = currency === "KHR" ? "៛" : "$";
-  return `${symbol}${amount.toLocaleString(locale === "km" ? "en-US" : "en-US", {
+  return `${symbol}${amount.toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -45,7 +46,6 @@ function formatMoney(amount: number, currency: string, locale: string) {
 
 export default function DashboardPage() {
   const t = useTranslations("Dashboard");
-  const locale = useLocale();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["dashboard"],
@@ -110,7 +110,7 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={data.usage_trend}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={12} tickFormatter={(v) => fmtPeriod(v)} />
                     <YAxis tickLine={false} axisLine={false} fontSize={12} width={40} />
                     <Tooltip
                       formatter={(value) => Number(value).toLocaleString()}
@@ -137,8 +137,7 @@ export default function DashboardPage() {
                 <p className="text-2xl font-semibold">
                   {formatMoney(
                     data.invoices_this_month.total,
-                    "USD",
-                    locale
+                    "USD"
                   )}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -189,7 +188,7 @@ export default function DashboardPage() {
                       </TableCell>
                       <TableCell>{invoice.customer?.name ?? "-"}</TableCell>
                       <TableCell>
-                        {formatMoney(invoice.total, invoice.currency, locale)}
+                        {formatMoney(invoice.total, invoice.currency)}
                       </TableCell>
                       <TableCell>
                         <StatusBadge status={invoice.status} />

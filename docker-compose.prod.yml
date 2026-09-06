@@ -5,8 +5,6 @@ services:
       dockerfile: Dockerfile
     container_name: printer_backend
     restart: unless-stopped
-    ports:
-      - "8100:9000"
     environment:
       - APP_ENV=production
       - APP_DEBUG=false
@@ -30,7 +28,75 @@ services:
         condition: service_healthy
     networks:
       - printer_network
-      - rsv_techsolution_app_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/api/status"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  horizon:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: printer_horizon
+    restart: unless-stopped
+    command: ["php", "artisan", "horizon"]
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://${APP_DOMAIN}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=printer_db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-printer_mps}
+      - DB_USERNAME=${DB_USERNAME:-printer}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_CLIENT=phpredis
+      - REDIS_HOST=printer_redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=redis
+      - CACHE_STORE=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - printer_network
+
+  scheduler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: printer_scheduler
+    restart: unless-stopped
+    command: >
+      sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://${APP_DOMAIN}
+      - DB_CONNECTION=pgsql
+      - DB_HOST=printer_db
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-printer_mps}
+      - DB_USERNAME=${DB_USERNAME:-printer}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_CLIENT=phpredis
+      - REDIS_HOST=printer_redis
+      - REDIS_PORT=6379
+      - QUEUE_CONNECTION=redis
+      - SESSION_DRIVER=redis
+      - CACHE_STORE=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - printer_network
 
   frontend:
     build:
@@ -40,10 +106,28 @@ services:
         - NEXT_PUBLIC_API_URL=https://${APP_DOMAIN}/api
     container_name: printer_frontend
     restart: unless-stopped
+    networks:
+      - printer_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  nginx:
+    image: nginx:alpine
+    container_name: printer_nginx
+    restart: unless-stopped
     ports:
-      - "3100:3000"
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
     networks:
       - printer_network
       - rsv_techsolution_app_network
@@ -60,9 +144,9 @@ services:
       - printer_db_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-printer} -d ${DB_DATABASE:-printer_mps}"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
     networks:
       - printer_network
 
@@ -70,13 +154,14 @@ services:
     image: redis:7-alpine
     container_name: printer_redis
     restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - printer_redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
     networks:
       - printer_network
 

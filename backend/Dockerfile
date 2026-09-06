@@ -15,7 +15,8 @@ RUN apk del $PHPIZE_DEPS
 # ============== Final Stage ==============
 FROM php:8.4-fpm-alpine
 
-RUN apk add --no-cache nginx supervisor
+RUN apk add --no-cache nginx supervisor \
+    libpng libjpeg-turbo freetype libxml2 libzip libpq icu-libs oniguruma
 
 COPY --from=php-ext /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=php-ext /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/

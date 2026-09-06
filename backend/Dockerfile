@@ -1,7 +1,7 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
-    git curl libpng-dev libxml2-dev zip unzip libpq-dev icu-dev libzip-dev \
+    git curl libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev zip unzip libpq-dev icu-dev libzip-dev oniguruma-dev \
     $PHPIZE_DEPS
 
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \

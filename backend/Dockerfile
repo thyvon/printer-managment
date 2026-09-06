@@ -2,8 +2,10 @@ FROM php:8.3-fpm-alpine
 
 RUN apk add --no-cache \
     git curl libpng-dev libxml2-dev zip unzip libpq-dev icu-dev \
-    && docker-php-ext-install pdo_pgsql bcmath mbstring exif pcntl bcmath gd intl \
-    && pecl install redis && docker-php-ext-enable redis
+    gcc make musl-dev \
+    && docker-php-ext-install pdo_pgsql bcmath mbstring exif pcntl gd intl \
+    && pecl install redis && docker-php-ext-enable redis \
+    && apk del gcc make musl-dev
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Services\InvoicingService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -41,5 +42,14 @@ class InvoiceController extends Controller
         );
 
         return new InvoiceResource($invoice->load('customer', 'lines'));
+    }
+
+    public function pdf(Invoice $invoice)
+    {
+        $invoice->load('customer', 'lines');
+
+        return Pdf::view('invoice.pdf', compact('invoice'))
+            ->format('a4')
+            ->download("{$invoice->invoice_number}.pdf");
     }
 }

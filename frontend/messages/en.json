@@ -22,7 +22,8 @@
       "invoices": "Invoices",
       "usages": "Usage",
       "reports": "Reports",
-      "users": "Users"
+      "users": "Users",
+      "settings": "Settings"
     },
     "logout": "Log out"
   },
@@ -234,7 +235,8 @@
     "description": "Description",
     "quantity": "Qty",
     "unitPrice": "Unit price",
-    "amount": "Amount"
+    "amount": "Amount",
+    "downloadPdf": "Download PDF"
   },
   "Usages": {
     "title": "Usage",
@@ -438,5 +440,22 @@
     "empty": "No toners/parts yet.",
     "deleteTitle": "Delete toner/part",
     "deleteDescription": "Are you sure you want to delete {name}? This action cannot be undone."
+  },
+  "Settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and profile",
+    "profile": "Profile",
+    "profileDescription": "Update your personal information",
+    "password": "Password",
+    "passwordDescription": "Change your account password",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "saved": "Profile updated successfully",
+    "passwordChanged": "Password changed successfully"
   }
 }

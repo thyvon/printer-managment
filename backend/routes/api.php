@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
 use App\Http\Controllers\Api\PrinterController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\ServiceTicketController;
 use App\Http\Controllers\Api\SiteController;
@@ -35,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::patch('/user', [ProfileController::class, 'update']);
 
     Route::apiResource('customers', CustomerController::class);
     Route::apiResource('sites', SiteController::class);
@@ -42,13 +44,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('printers', PrinterController::class);
     Route::apiResource('contracts', ContractController::class);
     Route::apiResource('collectors', CollectorController::class);
-    Route::apiResource('users', UserController::class)->except(['create', 'edit']);
+    Route::apiResource('users', UserController::class)->except(['create', 'edit'])->middleware('admin');
     Route::apiResource('service-tickets', ServiceTicketController::class);
     Route::apiResource('toners', TonerController::class);
     Route::get('usages', [UsageController::class, 'index']);
     Route::post('invoices/generate', [InvoiceController::class, 'generate']);
     Route::get('invoices', [InvoiceController::class, 'index']);
     Route::get('invoices/{invoice}', [InvoiceController::class, 'show']);
+    Route::get('invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 });
 
 Route::prefix('collector')->middleware('collector.auth')->group(function () {

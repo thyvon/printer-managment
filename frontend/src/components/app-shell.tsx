@@ -23,6 +23,7 @@ import {
   Satellite,
   Users,
   UserCog,
+  Settings,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -40,6 +41,7 @@ const navItems = [
   { href: "/usages", key: "usages", icon: Gauge },
   { href: "/reports", key: "reports", icon: BarChart3 },
   { href: "/users", key: "users", icon: UserCog },
+  { href: "/settings", key: "settings", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: React.ReactNode }) {

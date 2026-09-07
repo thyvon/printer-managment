@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToCompany;
+use App\Notifications\InvoiceGeneratedNotification;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,13 @@ use Illuminate\Database\Eloquent\Model;
 class Invoice extends Model
 {
     use BelongsToCompany, HasFactory;
+
+    protected static function booted(): void
+    {
+        static::created(function (Invoice $invoice) {
+            $invoice->notifyAdmins();
+        });
+    }
 
     protected function casts(): array
     {
@@ -36,5 +44,16 @@ class Invoice extends Model
     public function lines()
     {
         return $this->hasMany(InvoiceLine::class);
+    }
+
+    public function notifyAdmins(): void
+    {
+        $admins = User::where('company_id', $this->company_id)
+            ->where('role', 'admin')
+            ->get();
+
+        foreach ($admins as $admin) {
+            $admin->notify(new InvoiceGeneratedNotification($this));
+        }
     }
 }

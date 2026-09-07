@@ -38,6 +38,7 @@ class ServiceTicketController extends Controller
         $data = $request->validated();
         $data['status'] = $data['status'] ?? 'open';
         $ticket = ServiceTicket::create($data);
+
         return new ServiceTicketResource($ticket->load(['customer', 'site', 'printer', 'assignedUser']));
     }
 
@@ -49,12 +50,14 @@ class ServiceTicketController extends Controller
     public function update(UpdateServiceTicketRequest $request, ServiceTicket $serviceTicket)
     {
         $serviceTicket->update($request->validated());
+
         return new ServiceTicketResource($serviceTicket->load(['customer', 'site', 'printer', 'assignedUser']));
     }
 
     public function destroy(ServiceTicket $serviceTicket)
     {
         $serviceTicket->delete();
+
         return response()->json(null, 204);
     }
 }

@@ -1,6 +1,15 @@
-device_address: "192.168.1.100"
-community: "public"
-poll_interval_seconds: 3600
-api_endpoint: "https://api.example.com/api/v1/readings"
+collector_name: "site-1-collector"
+api_endpoint: "https://api.example.com"
 api_token: "collector-registration-token"
+poll_interval_seconds: 3600
+heartbeat_interval_seconds: 300
 db_path: "readings.db"
+upload_batch_size: 50
+
+devices:
+  - ip: "192.168.1.100"
+    printer_id: 1
+    community: "public"
+  - ip: "192.168.1.101"
+    printer_id: 2
+    community: "public"

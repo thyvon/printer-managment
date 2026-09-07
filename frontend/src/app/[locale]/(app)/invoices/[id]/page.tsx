@@ -19,9 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fmtPeriod } from "@/lib/dates";
+import { tokenStore } from "@/lib/api";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
 function formatMoney(amount: number, currency: string) {
   const symbol = currency === "KHR" ? "៛" : "$";
@@ -70,7 +73,36 @@ export default function InvoiceDetailPage({
         {t("backToInvoices")}
       </Link>
 
-      <PageHeader title={pageTitle} description={data.customer?.name} />
+      <PageHeader
+        title={pageTitle}
+        description={data.customer?.name}
+        actions={
+          <a
+            href={`${API_URL}/invoices/${id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+            onClick={(e) => {
+              e.preventDefault();
+              fetch(`${API_URL}/invoices/${id}/pdf`, {
+                headers: { Authorization: `Bearer ${tokenStore.get()}` },
+              })
+                .then((res) => res.blob())
+                .then((blob) => {
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${data.invoice_number}.pdf`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                });
+            }}
+          >
+            <Download />
+            {t("downloadPdf")}
+          </a>
+        }
+      />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

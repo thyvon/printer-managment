@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToCompany;
+use App\Notifications\ServiceTicketAssignedNotification;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,18 @@ class ServiceTicket extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::updated(function (ServiceTicket $ticket) {
+            if ($ticket->wasChanged('assigned_user_id') && $ticket->assigned_user_id) {
+                $user = User::find($ticket->assigned_user_id);
+                if ($user) {
+                    $user->notify(new ServiceTicketAssignedNotification($ticket));
+                }
+            }
+        });
+    }
 
     public function customer()
     {

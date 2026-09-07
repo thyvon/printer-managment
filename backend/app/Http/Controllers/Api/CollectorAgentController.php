@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\CounterReading;
+use App\Jobs\ProcessCounterReadings;
+use App\Models\Printer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -44,29 +45,26 @@ class CollectorAgentController extends Controller
             'readings.*.read_at' => ['nullable', 'date'],
         ]);
 
-        $sitePrinterIds = $collector->site
-            ? $collector->site->printers()->pluck('id')->all()
-            : [];
+        if ($collector->site_id) {
+            $sitePrinterIds = Printer::where('site_id', $collector->site_id)->pluck('id')->all();
 
-        foreach ($data['readings'] as $reading) {
-            if ($collector->site_id && ! in_array($reading['printer_id'], $sitePrinterIds)) {
-                throw ValidationException::withMessages([
-                    'readings.*.printer_id' => "Printer {$reading['printer_id']} does not belong to this collector's site.",
-                ]);
+            foreach ($data['readings'] as $reading) {
+                if (! in_array($reading['printer_id'], $sitePrinterIds)) {
+                    throw ValidationException::withMessages([
+                        'readings.*.printer_id' => "Printer {$reading['printer_id']} does not belong to this collector's site.",
+                    ]);
+                }
             }
-
-            CounterReading::create([
-                'collector_id' => $collector->id,
-                'printer_id' => $reading['printer_id'],
-                'total_pages' => $reading['total_pages'],
-                'mono_pages' => $reading['mono_pages'] ?? 0,
-                'color_pages' => $reading['color_pages'] ?? 0,
-                'read_at' => $reading['read_at'] ?? now(),
-            ]);
         }
 
+        ProcessCounterReadings::dispatch(
+            $collector->id,
+            $collector->site_id,
+            $data['readings']
+        );
+
         return response()->json([
-            'message' => 'stored',
+            'message' => 'queued',
             'count' => count($data['readings']),
         ]);
     }

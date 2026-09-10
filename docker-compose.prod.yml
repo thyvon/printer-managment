@@ -129,7 +129,6 @@ services:
       - frontend
     networks:
       - printer_network
-      - rsv_techsolution_app_network
 
   db:
     image: postgres:17-alpine
@@ -216,5 +215,3 @@ configs:
 networks:
   printer_network:
     driver: bridge
-  rsv_techsolution_app_network:
-    external: true

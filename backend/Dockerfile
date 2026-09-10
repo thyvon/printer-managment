@@ -1,25 +1,30 @@
-FROM php:8.4-fpm-alpine AS php-ext
+# ============================================
+# Stage 1: Install PHP extensions (pre-compiled, fast)
+# ============================================
+FROM php:8.4-fpm-alpine AS ext-builder
+
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN apk add --no-cache \
-    git curl libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev zip unzip \
-    libpq-dev icu-dev libzip-dev oniguruma-dev \
-    $PHPIZE_DEPS
+    libpng-dev libjpeg-turbo-dev freetype-dev libxml2-dev \
+    libpq-dev icu-dev libzip-dev oniguruma-dev linux-headers \
+    libavif-dev libwebp-dev libxpm-dev
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_pgsql bcmath mbstring exif pcntl gd intl zip opcache
+RUN install-php-extensions \
+    pdo_pgsql bcmath mbstring exif pcntl gd intl zip opcache redis
 
-RUN pecl install redis && docker-php-ext-enable redis
-
-RUN apk del $PHPIZE_DEPS
-
-# ============== Final Stage ==============
+# ============================================
+# Stage 2: Final production image
+# ============================================
 FROM php:8.4-fpm-alpine
 
-RUN apk add --no-cache nginx supervisor \
-    libpng libjpeg-turbo freetype libxml2 libzip libpq icu-libs oniguruma
+RUN apk add --no-cache \
+    nginx supervisor curl \
+    libpng libjpeg-turbo freetype libxml2 libzip libpq icu-libs oniguruma \
+    lz4-libs libavif libwebp libxpm
 
-COPY --from=php-ext /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
-COPY --from=php-ext /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+COPY --from=ext-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=ext-builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -41,6 +46,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 COPY . .
+
 RUN composer dump-autoload --optimize --no-dev \
     && mkdir -p storage/framework/{cache,sessions,testing,views} \
     && mkdir -p storage/logs \

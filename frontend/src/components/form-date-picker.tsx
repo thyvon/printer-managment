@@ -98,7 +98,7 @@ export function FormDatePicker<T extends FieldValues>({
         createPortal(
           <div
             ref={popupRef}
-            className="z-50 flex origin-(--transform-origin) flex-col rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10 animate-in fade-in-0 zoom-in-95 duration-100"
+            className="z-50 flex flex-col rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10"
             style={{
               position: "absolute",
               top: pos.top,

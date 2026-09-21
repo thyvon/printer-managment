@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
 use App\Models\Concerns\BelongsToCompany;
 use App\Notifications\InvoiceGeneratedNotification;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -49,7 +50,7 @@ class Invoice extends Model
     public function notifyAdmins(): void
     {
         $admins = User::where('company_id', $this->company_id)
-            ->where('role', 'admin')
+            ->where('role', UserRole::Admin)
             ->get();
 
         foreach ($admins as $admin) {

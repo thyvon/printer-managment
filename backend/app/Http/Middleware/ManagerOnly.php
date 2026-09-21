@@ -7,11 +7,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminOnly
+class ManagerOnly
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || $request->user()->role !== UserRole::Admin) {
+        if (! $request->user() || ! in_array($request->user()->role, [UserRole::Admin, UserRole::Manager])) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 

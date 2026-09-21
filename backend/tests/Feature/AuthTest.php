@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\Company;
 use App\Models\User;
 
@@ -19,7 +20,7 @@ it('registers a company and owner user, returning a token', function () {
     $user = User::where('email', 'admin@example.com')->first();
 
     expect($user)->not->toBeNull()
-        ->and($user->role)->toBe('admin')
+        ->and($user->role)->toBe(UserRole::Admin)
         ->and($user->company_id)->not->toBeNull()
         ->and($user->company->name)->toBe('ABC Rentals');
 });

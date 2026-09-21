@@ -16,4 +16,14 @@ enum UserRole: string
             self::Staff => 'Staff',
         };
     }
+
+    public function isAdmin(): bool
+    {
+        return $this === self::Admin;
+    }
+
+    public function isManagerOrAbove(): bool
+    {
+        return $this === self::Admin || $this === self::Manager;
+    }
 }

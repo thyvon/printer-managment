@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminOnly;
 use App\Http\Middleware\CollectorAuth;
+use App\Http\Middleware\ManagerOnly;
 use App\Http\Middleware\PlatformAdmin;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'collector.auth' => CollectorAuth::class,
             'admin' => AdminOnly::class,
+            'manager' => ManagerOnly::class,
             'platform.admin' => PlatformAdmin::class,
         ]);
     })

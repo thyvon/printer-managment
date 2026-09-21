@@ -9,7 +9,6 @@ use App\Models\Invoice;
 use App\Models\Printer;
 use App\Models\Site;
 use App\Models\User;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

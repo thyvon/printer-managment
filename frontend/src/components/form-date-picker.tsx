@@ -60,7 +60,7 @@ export function FormDatePicker<T extends FieldValues>({
           <CalendarIcon className="mr-2 size-4" />
           {dateValue ? format(dateValue, "PPP") : (placeholder ?? "Pick a date")}
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 z-[100]" align="start">
           <Calendar
             mode="single"
             selected={dateValue}

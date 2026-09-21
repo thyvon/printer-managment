@@ -49,8 +49,7 @@ export function FormCombobox<T extends FieldValues>({
         onValueChange={(val) => {
           const match = options.find((o) => o.value === String(val));
           if (match) {
-            const numVal = Number(match.value);
-            field.onChange(Number.isNaN(numVal) ? match.value : numVal);
+            field.onChange(match.value);
           }
         }}
         isItemEqualToValue={(a, b) => {

@@ -25,7 +25,7 @@ import { FormDatePicker } from "@/components/form-date-picker";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
-  customer_id: z.number().min(1),
+  customer_id: z.string().min(1),
   site_id: z.string().optional().or(z.literal("")),
   printer_id: z.string().optional().or(z.literal("")),
   title: z.string().min(3),
@@ -67,7 +67,7 @@ export function ServiceTicketForm({
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      customer_id: defaultCustomerId ?? customers[0]?.id ?? 0,
+      customer_id: String(defaultCustomerId ?? customers[0]?.id ?? ""),
       site_id: "",
       printer_id: "",
       title: "",
@@ -83,7 +83,7 @@ export function ServiceTicketForm({
   useEffect(() => {
     if (open) {
       methods.reset({
-        customer_id: ticket?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? 0,
+        customer_id: String(ticket?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? ""),
         site_id: String(ticket?.site_id ?? ""),
         printer_id: String(ticket?.printer_id ?? ""),
         title: ticket?.title ?? "",
@@ -101,6 +101,7 @@ export function ServiceTicketForm({
     setServerError(null);
     const payload = {
       ...values,
+      customer_id: Number(values.customer_id),
       site_id: values.site_id ? Number(values.site_id) : null,
       printer_id: values.printer_id ? Number(values.printer_id) : null,
       assigned_user_id: values.assigned_user_id ? Number(values.assigned_user_id) : null,

@@ -23,7 +23,7 @@ import { FormCombobox } from "@/components/form-combobox";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
-  customer_id: z.number().min(1),
+  customer_id: z.string().min(1),
   name: z.string().min(2),
   address: z.string().optional().or(z.literal("")),
   city: z.string().optional().or(z.literal("")),
@@ -54,7 +54,7 @@ export function SiteForm({
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      customer_id: defaultCustomerId ?? customers[0]?.id ?? 0,
+      customer_id: String(defaultCustomerId ?? customers[0]?.id ?? ""),
       name: "",
       address: "",
       city: "",
@@ -65,7 +65,7 @@ export function SiteForm({
   useEffect(() => {
     if (open) {
       methods.reset({
-        customer_id: site?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? 0,
+        customer_id: String(site?.customer_id ?? defaultCustomerId ?? customers[0]?.id ?? ""),
         name: site?.name ?? "",
         address: site?.address ?? "",
         city: site?.city ?? "",
@@ -78,6 +78,7 @@ export function SiteForm({
     setServerError(null);
     const payload = {
       ...values,
+      customer_id: Number(values.customer_id),
       address: values.address || null,
       city: values.city || null,
       phone: values.phone || null,

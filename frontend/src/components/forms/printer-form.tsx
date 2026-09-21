@@ -23,7 +23,7 @@ import { FormCombobox } from "@/components/form-combobox";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
-  site_id: z.number().min(1),
+  site_id: z.string().min(1),
   name: z.string().min(2),
   manufacturer: z.string().optional().or(z.literal("")),
   model: z.string().optional().or(z.literal("")),
@@ -61,7 +61,7 @@ export function PrinterForm({
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      site_id: defaultSiteId ?? sites[0]?.id ?? 0,
+      site_id: String(defaultSiteId ?? sites[0]?.id ?? ""),
       name: "",
       manufacturer: "",
       model: "",
@@ -75,7 +75,7 @@ export function PrinterForm({
   useEffect(() => {
     if (open) {
       methods.reset({
-        site_id: printer?.site_id ?? defaultSiteId ?? sites[0]?.id ?? 0,
+        site_id: String(printer?.site_id ?? defaultSiteId ?? sites[0]?.id ?? ""),
         name: printer?.name ?? "",
         manufacturer: printer?.manufacturer ?? "",
         model: printer?.model ?? "",
@@ -91,6 +91,7 @@ export function PrinterForm({
     setServerError(null);
     const payload = {
       ...values,
+      site_id: Number(values.site_id),
       manufacturer: values.manufacturer || null,
       model: values.model || null,
       serial_number: values.serial_number || null,

@@ -237,4 +237,22 @@ export type DashboardSummary = {
   recent_invoices: Invoice[];
   printers: Printer[];
   customers: Customer[];
+  low_stock_toners: Array<{
+    id: number;
+    name: string;
+    part_number: string | null;
+    color: string | null;
+    current_stock: number;
+    low_stock_threshold: number;
+    unit: string;
+  }>;
+  open_tickets: Array<{
+    id: number;
+    title: string;
+    status: string;
+    priority: string;
+    customer_name: string | null;
+    printer_name: string | null;
+    scheduled_at: string | null;
+  }>;
 };

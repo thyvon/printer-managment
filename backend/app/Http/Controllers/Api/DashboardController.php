@@ -10,9 +10,12 @@ use App\Models\Contract;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Printer;
+use App\Models\ServiceTicket;
 use App\Models\Site;
+use App\Models\Toner;
 use App\Models\Usage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
@@ -46,6 +49,17 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $lowStockToners = Toner::where('current_stock', '<=', DB::raw('low_stock_threshold'))
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $openTickets = ServiceTicket::whereIn('status', ['open', 'assigned', 'in_progress'])
+            ->with('customer', 'printer')
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return response()->json([
             'counts' => [
                 'customers' => Customer::count(),
@@ -61,6 +75,24 @@ class DashboardController extends Controller
             'recent_invoices' => InvoiceResource::collection($recentInvoices),
             'printers' => PrinterResource::collection(Printer::with('site')->latest()->limit(5)->get()),
             'customers' => CustomerResource::collection(Customer::withCount('sites')->latest()->limit(5)->get()),
+            'low_stock_toners' => $lowStockToners->map(fn ($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'part_number' => $t->part_number,
+                'color' => $t->color,
+                'current_stock' => $t->current_stock,
+                'low_stock_threshold' => $t->low_stock_threshold,
+                'unit' => $t->unit,
+            ]),
+            'open_tickets' => $openTickets->map(fn ($t) => [
+                'id' => $t->id,
+                'title' => $t->title,
+                'status' => $t->status,
+                'priority' => $t->priority,
+                'customer_name' => $t->customer?->name,
+                'printer_name' => $t->printer?->name,
+                'scheduled_at' => $t->scheduled_at?->toIso8601String(),
+            ]),
         ]);
     }
 }

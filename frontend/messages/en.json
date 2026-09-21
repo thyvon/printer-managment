@@ -112,7 +112,17 @@
     "name": "Name",
     "currency": "Currency",
     "sites": "Sites",
-    "loadError": "Could not load dashboard data."
+    "loadError": "Could not load dashboard data.",
+    "lowStockToners": "Low Stock Toners",
+    "openTickets": "Open Tickets",
+    "tonerName": "Toner",
+    "stock": "Stock",
+    "threshold": "Threshold",
+    "ticketTitle": "Title",
+    "priority": "Priority",
+    "emptyToners": "All toners are well stocked.",
+    "emptyTickets": "No open tickets.",
+    "viewAll": "View all"
   },
   "Customers": {
     "title": "Customers",

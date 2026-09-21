@@ -34,6 +34,8 @@ import {
   MapPin,
   Printer,
   Users,
+  AlertTriangle,
+  Hammer,
 } from "lucide-react";
 
 function formatMoney(amount: number, currency: string) {
@@ -93,6 +95,92 @@ export default function DashboardPage() {
             </Card>
           );
         })}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <AlertTriangle className="size-4 text-amber-500" />
+              {t("lowStockToners")}
+            </CardTitle>
+            <Link href="/toners" className="text-sm text-muted-foreground hover:text-foreground">
+              {t("viewAll")}
+            </Link>
+          </CardHeader>
+          <CardContent className="p-0">
+            {data.low_stock_toners.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("emptyToners")}
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("tonerName")}</TableHead>
+                    <TableHead>{t("stock")}</TableHead>
+                    <TableHead>{t("threshold")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.low_stock_toners.map((toner) => (
+                    <TableRow key={toner.id}>
+                      <TableCell className="font-medium">{toner.name}</TableCell>
+                      <TableCell>
+                        <span className="text-destructive font-medium">{toner.current_stock}</span> {toner.unit}
+                      </TableCell>
+                      <TableCell>{toner.low_stock_threshold} {toner.unit}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Hammer className="size-4 text-blue-500" />
+              {t("openTickets")}
+            </CardTitle>
+            <Link href="/maintenance" className="text-sm text-muted-foreground hover:text-foreground">
+              {t("viewAll")}
+            </Link>
+          </CardHeader>
+          <CardContent className="p-0">
+            {data.open_tickets.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("emptyTickets")}
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("ticketTitle")}</TableHead>
+                    <TableHead>{t("customer")}</TableHead>
+                    <TableHead>{t("priority")}</TableHead>
+                    <TableHead>{t("status")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.open_tickets.map((ticket) => (
+                    <TableRow key={ticket.id}>
+                      <TableCell className="font-medium">{ticket.title}</TableCell>
+                      <TableCell>{ticket.customer_name ?? "-"}</TableCell>
+                      <TableCell>
+                        <StatusBadge status={ticket.priority} />
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={ticket.status} />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

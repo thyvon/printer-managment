@@ -80,7 +80,7 @@ export function DateRangePicker({
               requestAnimationFrame(() => setOpen(false));
             }
           }}
-          numberOfMonths={2}
+          numberOfMonths={1}
         />
       </PopoverContent>
     </Popover>

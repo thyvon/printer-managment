@@ -23,7 +23,8 @@
       "usages": "Usage",
       "reports": "Reports",
       "users": "Users",
-      "settings": "Settings"
+      "settings": "Settings",
+      "platform": "Platform Admin"
     },
     "logout": "Log out"
   },
@@ -467,5 +468,55 @@
     },
     "saved": "Profile updated successfully",
     "passwordChanged": "Password changed successfully"
+  },
+  "Platform": {
+    "title": "Platform Admin",
+    "subtitle": "Multi-tenant management",
+    "nav": {
+      "platformDashboard": "Dashboard",
+      "tenants": "Tenants",
+      "analytics": "Analytics"
+    },
+    "backToApp": "Back to app",
+    "backToTenants": "Back to tenants",
+    "dashboardTitle": "Platform Dashboard",
+    "dashboardSubtitle": "Overview of all tenants and revenue",
+    "loadError": "Could not load platform data.",
+    "stats": {
+      "totalTenants": "Total Tenants",
+      "activeTenants": "Active",
+      "trialTenants": "Trial",
+      "totalPrinters": "Total Printers"
+    },
+    "mrr": "Monthly Recurring Revenue",
+    "mrrCount": "{count} invoice(s) this month",
+    "plans": "Plans Distribution",
+    "overview": "Overview",
+    "totalUsers": "Total Users",
+    "totalCustomers": "Total Customers",
+    "totalSites": "Total Sites",
+    "recentTenants": "Recent Tenants",
+    "viewAll": "View all",
+    "tenantName": "Tenant",
+    "plan": "Plan",
+    "status": "Status",
+    "created": "Created",
+    "users": "Users",
+    "printers": "Printers",
+    "customers": "Customers",
+    "tenantsTitle": "Tenants",
+    "tenantsSubtitle": "Manage all tenant subscriptions",
+    "noTenants": "No tenants found.",
+    "recentUsers": "Recent Users",
+    "recentInvoices": "Recent Invoices",
+    "invoiceNumber": "Invoice #",
+    "total": "Total",
+    "role": "Role",
+    "name": "Name",
+    "email": "Email",
+    "editPlan": "Edit Plan",
+    "editPlanDescription": "Update the tenant's subscription plan and limits.",
+    "deviceLimit": "Device Limit",
+    "planUpdated": "Plan updated successfully."
   }
 }

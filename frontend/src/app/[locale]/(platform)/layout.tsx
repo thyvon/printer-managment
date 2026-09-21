@@ -8,54 +8,33 @@ import { PageLoading } from "@/components/loading";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-  BarChart3,
-  Box,
   Building2,
-  ContactRound,
-  FileText,
-  Gauge,
-  Hammer,
   LayoutDashboard,
   LogOut,
-  MapPin,
-  Printer,
-  Receipt,
-  Satellite,
   Users,
-  UserCog,
-  Settings,
-  Shield,
+  BarChart3,
+  ArrowLeft,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const navItems = [
-  { href: "/dashboard", key: "dashboard", icon: LayoutDashboard },
-  { href: "/customers", key: "customers", icon: Users },
-  { href: "/contacts", key: "contacts", icon: ContactRound },
-  { href: "/sites", key: "sites", icon: MapPin },
-  { href: "/printers", key: "printers", icon: Printer },
-  { href: "/collectors", key: "collectors", icon: Satellite },
-  { href: "/maintenance", key: "maintenance", icon: Hammer },
-  { href: "/toners", key: "toners", icon: Box },
-  { href: "/contracts", key: "contracts", icon: FileText },
-  { href: "/invoices", key: "invoices", icon: Receipt },
-  { href: "/usages", key: "usages", icon: Gauge },
-  { href: "/reports", key: "reports", icon: BarChart3 },
-  { href: "/users", key: "users", icon: UserCog },
-  { href: "/settings", key: "settings", icon: Settings },
+  { href: "/platform", key: "platformDashboard", icon: LayoutDashboard },
+  { href: "/platform/tenants", key: "tenants", icon: Users },
+  { href: "/platform/analytics", key: "analytics", icon: BarChart3 },
 ] as const;
 
-const platformItem = { href: "/platform", key: "platform", icon: Shield } as const;
-
-export function AppShell({ children }: { children: React.ReactNode }) {
-  const t = useTranslations("App");
-  const { status, company, user, logout } = useAuth();
+export default function PlatformLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const t = useTranslations("Platform");
+  const { status, user, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -63,7 +42,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (status === "unauthenticated") {
       router.replace("/login");
     }
-  }, [status, router]);
+    if (status === "authenticated" && !user?.is_platform_admin) {
+      router.replace("/dashboard");
+    }
+  }, [status, user, router]);
 
   if (!mounted || status === "loading") {
     return (
@@ -73,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (status === "unauthenticated") {
+  if (status === "unauthenticated" || !user?.is_platform_admin) {
     return null;
   }
 
@@ -83,16 +65,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex h-14 items-center gap-2 border-b px-4">
           <Building2 className="size-5" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium">{company?.name ?? "MPS"}</p>
+            <p className="truncate text-sm font-medium">{t("title")}</p>
             <p className="truncate text-xs text-muted-foreground">
-              {company?.plan}
+              {t("subtitle")}
             </p>
           </div>
         </div>
         <nav className="flex-1 space-y-1 p-3">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname.startsWith(item.href);
+            const active = pathname === item.href || (item.href !== "/platform" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
@@ -109,20 +91,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          {user?.is_platform_admin && (
-            <Link
-              href={platformItem.href}
-              className={cn(
-                "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                pathname.startsWith(platformItem.href)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <Shield className="size-4" />
-              {t("nav.platform")}
-            </Link>
-          )}
         </nav>
         <div className="space-y-3 border-t p-3">
           <div className="px-1">
@@ -131,6 +99,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center justify-between gap-2">
             <LocaleSwitcher />
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                <ArrowLeft className="size-4" />
+                {t("backToApp")}
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="sm"
@@ -138,7 +112,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="text-muted-foreground"
             >
               <LogOut className="size-4" />
-              {t("logout")}
             </Button>
           </div>
         </div>
@@ -146,13 +119,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur md:hidden">
-          <p className="truncate text-sm font-medium">{company?.name ?? "MPS"}</p>
+          <p className="truncate text-sm font-medium">{t("title")}</p>
           <LocaleSwitcher />
         </header>
         <nav className="flex gap-1 overflow-x-auto border-b bg-background px-3 py-2 md:hidden">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const active = pathname.startsWith(item.href);
+            const active = pathname === item.href;
             return (
               <Link
                 key={item.href}

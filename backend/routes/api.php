@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ContractController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\PlatformController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\ReportController;
@@ -57,4 +58,12 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('collector')->middleware('collector.auth')->group(function () {
     Route::post('/heartbeat', [CollectorAgentController::class, 'heartbeat']);
     Route::post('/readings', [CollectorAgentController::class, 'readings']);
+});
+
+Route::prefix('platform')->middleware(['auth:sanctum', 'platform.admin'])->group(function () {
+    Route::get('/dashboard', [PlatformController::class, 'dashboard']);
+    Route::get('/tenants', [PlatformController::class, 'index']);
+    Route::get('/tenants/{company}', [PlatformController::class, 'show']);
+    Route::patch('/tenants/{company}/plan', [PlatformController::class, 'updatePlan']);
+    Route::get('/analytics', [PlatformController::class, 'analytics']);
 });

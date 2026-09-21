@@ -17,6 +17,7 @@ export type User = {
   name: string;
   email: string;
   role: string;
+  is_platform_admin: boolean;
   created_at: string;
   updated_at: string;
   company?: Company;
@@ -255,4 +256,42 @@ export type DashboardSummary = {
     printer_name: string | null;
     scheduled_at: string | null;
   }>;
+};
+
+export type PlatformSummary = {
+  summary: {
+    total_tenants: number;
+    active_tenants: number;
+    trial_tenants: number;
+    total_users: number;
+    total_printers: number;
+    total_customers: number;
+    total_sites: number;
+  };
+  plans: {
+    starter: number;
+    growth: number;
+    enterprise: number;
+  };
+  mrr: {
+    total: number;
+    count: number;
+  };
+  recent_tenants: Array<{
+    id: number;
+    name: string;
+    plan: string;
+    status: string;
+    created_at: string;
+  }>;
+};
+
+export type TenantDetail = Company & {
+  users_count: number;
+  printers_count: number;
+  customers_count: number;
+  sites_count: number;
+  contracts_count: number;
+  recent_invoices: Invoice[];
+  recent_users: User[];
 };

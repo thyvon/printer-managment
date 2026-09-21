@@ -189,7 +189,7 @@ export default function MaintenancePage() {
         ticket={editing}
         customers={customersQuery.data ?? []}
         sites={sitesQuery.data ?? []}
-        printers={data.data.flatMap((t) => t.printer ? [t.printer] : [])}
+        printers={printersQuery.data ?? []}
         users={usersQuery.data ?? []}
         onSuccess={invalidate}
       />

@@ -547,7 +547,9 @@
     "filterModel": "Filter by model",
     "allEvents": "All events",
     "allModels": "All models",
-    "empty": "No audit logs found."
+    "empty": "No audit logs found.",
+    "detailTitle": "Activity Log Detail",
+    "detailChanges": "Changes"
   },
   "Notifications": {
     "title": "Notifications",

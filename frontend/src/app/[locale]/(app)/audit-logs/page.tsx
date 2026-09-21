@@ -20,6 +20,12 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -40,12 +46,62 @@ type AuditLogEntry = {
   user?: { id: number; name: string; email: string };
 };
 
+function ChangesDiff({ oldValues, newValues }: { oldValues: Record<string, unknown> | null; newValues: Record<string, unknown> | null }) {
+  const allKeys = [
+    ...Object.keys(oldValues ?? {}),
+    ...Object.keys(newValues ?? {}),
+  ];
+  const uniqueKeys = [...new Set(allKeys)];
+
+  if (uniqueKeys.length === 0) {
+    return <p className="text-sm text-muted-foreground">No changes recorded.</p>;
+  }
+
+  return (
+    <div className="space-y-2">
+      {uniqueKeys.map((key) => {
+        const oldVal = oldValues?.[key];
+        const newVal = newValues?.[key];
+        const changed = JSON.stringify(oldVal) !== JSON.stringify(newVal);
+
+        return (
+          <div key={key} className="rounded-md border p-2.5">
+            <p className="text-xs font-medium text-muted-foreground mb-1">{key}</p>
+            {changed ? (
+              <div className="flex items-center gap-2 text-sm">
+                {oldVal !== undefined && (
+                  <span className="line-through text-destructive/80">
+                    {typeof oldVal === "object" ? JSON.stringify(oldVal) : String(oldVal)}
+                  </span>
+                )}
+                <span className="text-muted-foreground">→</span>
+                {newVal !== undefined && (
+                  <span className="text-green-600 dark:text-green-400">
+                    {typeof newVal === "object" ? JSON.stringify(newVal) : String(newVal)}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm">
+                {typeof (newVal ?? oldVal) === "object"
+                  ? JSON.stringify(newVal ?? oldVal)
+                  : String(newVal ?? oldVal ?? "")}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AuditLogsPage() {
   const t = useTranslations("AuditLogs");
   const tCommon = useTranslations("Common");
   const [page, setPage] = useState(1);
   const [eventFilter, setEventFilter] = useState<string>("");
   const [modelFilter, setModelFilter] = useState<string>("");
+  const [selected, setSelected] = useState<AuditLogEntry | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["audit-logs", page, eventFilter, modelFilter],
@@ -132,7 +188,11 @@ export default function AuditLogsPage() {
                 </TableRow>
               ) : (
                 data.data.map((log) => (
-                  <TableRow key={log.id}>
+                  <TableRow
+                    key={log.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => setSelected(log)}
+                  >
                     <TableCell className="text-muted-foreground text-xs">
                       {new Date(log.created_at).toLocaleString()}
                     </TableCell>
@@ -167,6 +227,49 @@ export default function AuditLogsPage() {
       </Card>
 
       <PaginationControls setPage={setPage} data={data} />
+
+      <Dialog open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
+        <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t("detailTitle")}</DialogTitle>
+          </DialogHeader>
+          {selected && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <p className="text-muted-foreground">{t("timestamp")}</p>
+                  <p>{new Date(selected.created_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t("user")}</p>
+                  <p>{selected.user?.name ?? "-"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t("event")}</p>
+                  <StatusBadge status={selected.event} />
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t("model")}</p>
+                  <Badge variant="outline">{selected.auditable_type}</Badge>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t("recordId")}</p>
+                  <p>#{selected.auditable_id}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">{t("ipAddress")}</p>
+                  <p>{selected.ip_address ?? "-"}</p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm font-medium mb-2">{t("detailChanges")}</p>
+                <ChangesDiff oldValues={selected.old_values} newValues={selected.new_values} />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

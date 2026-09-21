@@ -21,6 +21,7 @@ import { ApiError } from "@/lib/api";
 import { toast } from "sonner";
 import { FormField } from "@/components/form-field";
 import { FormCombobox } from "@/components/form-combobox";
+import { FormDatePicker } from "@/components/form-date-picker";
 import { useEffect, useState } from "react";
 
 const schema = z.object({
@@ -204,15 +205,11 @@ export function ServiceTicketForm({
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("fields.scheduledAt")}</label>
-              <input
-                type="date"
-                value={methods.getValues("scheduled_at")?.slice(0, 10) ?? ""}
-                onChange={(e) => methods.setValue("scheduled_at", e.target.value || "")}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <FormDatePicker
+                control={methods.control}
+                name="scheduled_at"
+                label={t("fields.scheduledAt")}
               />
-            </div>
 
             <FormField name="parts_used" label={t("fields.partsUsed")}>
               {({ id, ...props }) => (

@@ -20,6 +20,7 @@ import { ApiError } from "@/lib/api";
 import { toast } from "sonner";
 import { FormField } from "@/components/form-field";
 import { FormCombobox } from "@/components/form-combobox";
+import { FormDatePicker } from "@/components/form-date-picker";
 import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -196,27 +197,19 @@ export function ContractForm({
                 />
               )}
             </FormField>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("fields.startDate")}</label>
-              <input
-                type="date"
-                value={methods.getValues("start_date")?.slice(0, 10) ?? ""}
-                onChange={(e) => methods.setValue("start_date", e.target.value || "")}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <FormDatePicker
+                control={methods.control}
+                name="start_date"
+                label={t("fields.startDate")}
               />
-            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">{t("fields.endDate")}</label>
-              <input
-                type="date"
-                value={methods.getValues("end_date")?.slice(0, 10) ?? ""}
-                onChange={(e) => methods.setValue("end_date", e.target.value || "")}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <FormDatePicker
+                control={methods.control}
+                name="end_date"
+                label={t("fields.endDate")}
               />
-            </div>
           </div>
 
           <div className="space-y-3">

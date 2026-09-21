@@ -81,6 +81,8 @@ export default function AuditLogsPage() {
               <SelectItem value="created">Created</SelectItem>
               <SelectItem value="updated">Updated</SelectItem>
               <SelectItem value="deleted">Deleted</SelectItem>
+              <SelectItem value="login">Login</SelectItem>
+              <SelectItem value="logout">Logout</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -95,9 +97,13 @@ export default function AuditLogsPage() {
               <SelectItem value="Customer">Customer</SelectItem>
               <SelectItem value="Site">Site</SelectItem>
               <SelectItem value="Printer">Printer</SelectItem>
+              <SelectItem value="Contract">Contract</SelectItem>
+              <SelectItem value="Contact">Contact</SelectItem>
+              <SelectItem value="Collector">Collector</SelectItem>
               <SelectItem value="Invoice">Invoice</SelectItem>
               <SelectItem value="Toner">Toner</SelectItem>
               <SelectItem value="ServiceTicket">ServiceTicket</SelectItem>
+              <SelectItem value="User">User</SelectItem>
             </SelectContent>
           </Select>
         </div>

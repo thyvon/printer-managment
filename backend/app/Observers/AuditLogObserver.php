@@ -29,24 +29,28 @@ class AuditLogObserver
 
     private function log(Model $model, string $event, array $old, array $new): void
     {
-        $request = request();
-        $user = $request->user();
-        $companyId = $model->company_id ?? $user?->company_id;
+        try {
+            $request = request();
+            $user = $request->user();
+            $companyId = $model->company_id ?? $user?->company_id;
 
-        if (! $companyId) {
-            return;
+            if (! $companyId) {
+                return;
+            }
+
+            AuditLog::create([
+                'company_id' => $companyId,
+                'user_id' => $user?->id,
+                'auditable_type' => get_class($model),
+                'auditable_id' => $model->getKey(),
+                'event' => $event,
+                'old_values' => $old,
+                'new_values' => $new,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ]);
+        } catch (\Throwable) {
+            // Audit logging should never crash the main flow
         }
-
-        AuditLog::create([
-            'company_id' => $companyId,
-            'user_id' => $user?->id,
-            'auditable_type' => get_class($model),
-            'auditable_id' => $model->getKey(),
-            'event' => $event,
-            'old_values' => $old,
-            'new_values' => $new,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
     }
 }

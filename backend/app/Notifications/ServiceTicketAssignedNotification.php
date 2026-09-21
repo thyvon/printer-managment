@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Telegram\TelegramMessage;
 
 class ServiceTicketAssignedNotification extends Notification
 {
@@ -18,7 +19,15 @@ class ServiceTicketAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        if (config('services.telegram.bot_token')) {
+            $channels[] = 'telegram';
+        } elseif (config('mail.default') !== 'log') {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -42,5 +51,13 @@ class ServiceTicketAssignedNotification extends Notification
             'url' => '/maintenance',
             'type' => 'info',
         ]);
+    }
+
+    public function toTelegram(object $notifiable): TelegramMessage
+    {
+        $priority = ucfirst($this->ticket->priority);
+
+        return TelegramMessage::create()
+            ->content("🎫 *Service Ticket Assigned*\n\n*{$this->ticket->title}*\nPriority: {$priority}\n\n".($this->ticket->description ?: 'No description provided.'));
     }
 }

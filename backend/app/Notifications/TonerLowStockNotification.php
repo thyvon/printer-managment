@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Telegram\TelegramMessage;
 
 class TonerLowStockNotification extends Notification
 {
@@ -18,7 +19,15 @@ class TonerLowStockNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        if (config('services.telegram.bot_token')) {
+            $channels[] = 'telegram';
+        } elseif (config('mail.default') !== 'log') {
+            $channels[] = 'mail';
+        }
+
+        return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -40,5 +49,11 @@ class TonerLowStockNotification extends Notification
             'url' => '/toners',
             'type' => 'warning',
         ]);
+    }
+
+    public function toTelegram(object $notifiable): TelegramMessage
+    {
+        return TelegramMessage::create()
+            ->content("⚠️ *Low Toner Stock*\n\n*{$this->toner->name}* ({$this->toner->part_number})\nStock: {$this->toner->current_stock} {$this->toner->unit}\nThreshold: {$this->toner->low_stock_threshold} {$this->toner->unit}\n\nPlease restock soon.");
     }
 }

@@ -34,7 +34,7 @@ const tierSchema = z.object({
 });
 
 const schema = z.object({
-  customer_id: z.coerce.number().min(1),
+  customer_id: z.string().min(1),
   name: z.string().min(2),
   status: z.enum(["active", "pending", "expired", "cancelled"]),
   monthly_fee: z.coerce.number().min(0).optional(),
@@ -65,7 +65,7 @@ export function ContractForm({
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema) as Resolver<FormValues>,
     defaultValues: {
-      customer_id: customers[0]?.id ?? 0,
+      customer_id: String(customers[0]?.id ?? ""),
       name: "",
       status: "active",
       monthly_fee: undefined,
@@ -92,7 +92,7 @@ export function ContractForm({
   useEffect(() => {
     if (open) {
       methods.reset({
-        customer_id: contract?.customer_id ?? customers[0]?.id ?? 0,
+        customer_id: String(contract?.customer_id ?? customers[0]?.id ?? ""),
         name: contract?.name ?? "",
         status: contract?.status ?? "active",
         monthly_fee: contract?.monthly_fee ? Number(contract.monthly_fee) : undefined,
@@ -126,6 +126,7 @@ export function ContractForm({
     setServerError(null);
     const payload = {
       ...values,
+      customer_id: Number(values.customer_id),
       monthly_fee: values.monthly_fee ?? 0,
       start_date: values.start_date || null,
       end_date: values.end_date || null,

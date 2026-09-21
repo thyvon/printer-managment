@@ -24,7 +24,8 @@
       "reports": "Reports",
       "users": "Users",
       "settings": "Settings",
-      "platform": "Platform Admin"
+      "platform": "Platform Admin",
+      "auditLogs": "Audit Logs"
     },
     "logout": "Log out"
   },
@@ -517,6 +518,34 @@
     "editPlan": "Edit Plan",
     "editPlanDescription": "Update the tenant's subscription plan and limits.",
     "deviceLimit": "Device Limit",
-    "planUpdated": "Plan updated successfully."
+    "planUpdated": "Plan updated successfully.",
+    "analyticsTitle": "Analytics",
+    "analyticsSubtitle": "Platform growth and revenue trends",
+    "tenantGrowth": "Tenant Growth (6 months)",
+    "revenueTrend": "Revenue Trend (6 months)",
+    "byPlan": "Tenants by Plan",
+    "byStatus": "Tenants by Status",
+    "tenants": "Tenants",
+    "revenue": "Revenue",
+    "platformAdmin": "Platform Admin",
+    "userUpdated": "User updated successfully.",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "AuditLogs": {
+    "title": "Audit Logs",
+    "subtitle": "Track all changes across your data",
+    "timestamp": "Time",
+    "user": "User",
+    "event": "Event",
+    "model": "Model",
+    "recordId": "Record",
+    "changes": "Changed fields",
+    "ipAddress": "IP Address",
+    "filterEvent": "Filter by event",
+    "filterModel": "Filter by model",
+    "allEvents": "All events",
+    "allModels": "All models",
+    "empty": "No audit logs found."
   }
 }

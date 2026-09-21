@@ -73,6 +73,15 @@ export default function TenantDetailPage({
     },
   });
 
+  const togglePlatformAdmin = useMutation({
+    mutationFn: ({ userId, isPlatformAdmin }: { userId: number; isPlatformAdmin: boolean }) =>
+      api.patch(`/platform/users/${userId}`, { is_platform_admin: isPlatformAdmin }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["platform-tenant", id] });
+      toast.success(t("userUpdated"));
+    },
+  });
+
   if (isLoading) return <PageLoading />;
 
   if (isError || !data) {
@@ -151,6 +160,7 @@ export default function TenantDetailPage({
                   <TableHead>{t("name")}</TableHead>
                   <TableHead>{t("email")}</TableHead>
                   <TableHead>{t("role")}</TableHead>
+                  <TableHead>{t("platformAdmin")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -159,6 +169,15 @@ export default function TenantDetailPage({
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell><StatusBadge status={user.role} /></TableCell>
+                    <TableCell>
+                      <Button
+                        variant={user.is_platform_admin ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => togglePlatformAdmin.mutate({ userId: user.id, isPlatformAdmin: !user.is_platform_admin })}
+                      >
+                        {user.is_platform_admin ? t("yes") : t("no")}
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -9,6 +9,7 @@ use App\Models\Invoice;
 use App\Models\Printer;
 use App\Models\Site;
 use App\Models\User;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -119,6 +120,20 @@ class PlatformController extends Controller
                 'trial' => Company::where('status', 'trial')->count(),
                 'suspended' => Company::where('status', 'suspended')->count(),
             ],
+        ]);
+    }
+
+    public function updateUser(Request $request, User $user): JsonResponse
+    {
+        $data = $request->validate([
+            'is_platform_admin' => ['required', 'boolean'],
+        ]);
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'User updated.',
+            'user' => $user,
         ]);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CollectorAgentController;
 use App\Http\Controllers\Api\CollectorController;
@@ -48,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('users', UserController::class)->except(['create', 'edit'])->middleware('admin');
     Route::apiResource('service-tickets', ServiceTicketController::class);
     Route::apiResource('toners', TonerController::class);
+    Route::apiResource('audit-logs', AuditLogController::class)->only(['index']);
     Route::get('usages', [UsageController::class, 'index']);
     Route::post('invoices/generate', [InvoiceController::class, 'generate']);
     Route::get('invoices', [InvoiceController::class, 'index']);
@@ -65,5 +67,6 @@ Route::prefix('platform')->middleware(['auth:sanctum', 'platform.admin'])->group
     Route::get('/tenants', [PlatformController::class, 'index']);
     Route::get('/tenants/{company}', [PlatformController::class, 'show']);
     Route::patch('/tenants/{company}/plan', [PlatformController::class, 'updatePlan']);
+    Route::patch('/users/{user}', [PlatformController::class, 'updateUser']);
     Route::get('/analytics', [PlatformController::class, 'analytics']);
 });

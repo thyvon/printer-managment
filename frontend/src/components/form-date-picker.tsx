@@ -27,33 +27,35 @@ export function FormDatePicker<T extends FieldValues>({
   disabled,
 }: FormDatePickerProps<T>) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
   const { field, fieldState } = useController({ control, name });
 
   const dateValue = field.value ? new Date(field.value as string) : undefined;
 
-  const [pos, setPos] = useState({ top: 0, left: 0 });
-
-  const updatePosition = useCallback(() => {
+  const handleOpen = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    setPos({
-      top: rect.bottom + window.scrollY + 4,
-      left: rect.left + window.scrollX,
-    });
+    setPos({ top: rect.bottom + window.scrollY + 4, left: rect.left + window.scrollX });
+    setOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setOpen(false);
+    setPos(null);
   }, []);
 
   useEffect(() => {
-    if (open) updatePosition();
-  }, [open, updatePosition]);
-
-  useEffect(() => {
     if (!open) return;
-    const onScroll = () => updatePosition();
+    const onScroll = () => {
+      if (!triggerRef.current) return;
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + window.scrollY + 4, left: rect.left + window.scrollX });
+    };
     window.addEventListener("scroll", onScroll, true);
     return () => window.removeEventListener("scroll", onScroll, true);
-  }, [open, updatePosition]);
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -64,12 +66,12 @@ export function FormDatePicker<T extends FieldValues>({
         !popupRef.current.contains(target) &&
         !triggerRef.current?.contains(target)
       ) {
-        setOpen(false);
+        handleClose();
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
+  }, [open, handleClose]);
 
   return (
     <div className="space-y-1.5">
@@ -84,7 +86,7 @@ export function FormDatePicker<T extends FieldValues>({
         type="button"
         variant="outline"
         disabled={disabled}
-        onClick={() => setOpen(!open)}
+        onClick={handleOpen}
         className={cn(
           "w-full justify-start text-left font-normal",
           !dateValue && "text-muted-foreground",
@@ -94,28 +96,23 @@ export function FormDatePicker<T extends FieldValues>({
         <CalendarIcon className="mr-2 size-4" />
         {dateValue ? format(dateValue, "PPP") : (placeholder ?? "Pick a date")}
       </Button>
-      {open &&
-        createPortal(
-          <div
-            ref={popupRef}
-            className="z-50 flex flex-col rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10"
-            style={{
-              position: "absolute",
-              top: pos.top,
-              left: pos.left,
+      {open && pos && createPortal(
+        <div
+          ref={popupRef}
+          className="z-50 flex flex-col rounded-lg bg-popover p-2.5 text-sm text-popover-foreground shadow-md ring-1 ring-foreground/10"
+          style={{ position: "fixed", top: pos.top - window.scrollY, left: pos.left }}
+        >
+          <Calendar
+            mode="single"
+            selected={dateValue}
+            onSelect={(day) => {
+              field.onChange(day ? format(day, "yyyy-MM-dd") : "");
+              handleClose();
             }}
-          >
-            <Calendar
-              mode="single"
-              selected={dateValue}
-              onSelect={(day) => {
-                field.onChange(day ? format(day, "yyyy-MM-dd") : "");
-                setOpen(false);
-              }}
-            />
-          </div>,
-          document.body
-        )}
+          />
+        </div>,
+        document.body
+      )}
       {fieldState.error && (
         <p className="text-sm text-destructive">{fieldState.error.message}</p>
       )}

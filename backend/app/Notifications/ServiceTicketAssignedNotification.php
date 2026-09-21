@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\ServiceTicket;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -17,7 +18,7 @@ class ServiceTicketAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -31,5 +32,15 @@ class ServiceTicketAssignedNotification extends Notification
             ->line($this->ticket->description ?: 'No description provided.')
             ->action('View Ticket', url('/maintenance'))
             ->line('Please review and update the ticket status as needed.');
+    }
+
+    public function toDatabase(object $notifiable): DatabaseMessage
+    {
+        return new DatabaseMessage([
+            'title' => 'Service Ticket Assigned',
+            'message' => "You have been assigned: {$this->ticket->title}",
+            'url' => '/maintenance',
+            'type' => 'info',
+        ]);
     }
 }

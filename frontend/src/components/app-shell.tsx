@@ -26,6 +26,7 @@ import {
   Settings,
   Shield,
   ScrollText,
+  Bell,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -43,6 +44,7 @@ const navItems = [
   { href: "/usages", key: "usages", icon: Gauge },
   { href: "/reports", key: "reports", icon: BarChart3 },
   { href: "/users", key: "users", icon: UserCog },
+  { href: "/notifications", key: "notifications", icon: Bell },
   { href: "/audit-logs", key: "auditLogs", icon: ScrollText },
   { href: "/settings", key: "settings", icon: Settings },
 ] as const;

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ContractController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PlatformController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\ProfileController;
@@ -50,6 +51,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('service-tickets', ServiceTicketController::class);
     Route::apiResource('toners', TonerController::class);
     Route::apiResource('audit-logs', AuditLogController::class)->only(['index']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::patch('notifications/{id}/read', [NotificationController::class, 'markRead']);
+    Route::patch('notifications/read-all', [NotificationController::class, 'markAllRead']);
     Route::get('usages', [UsageController::class, 'index']);
     Route::post('invoices/generate', [InvoiceController::class, 'generate']);
     Route::get('invoices', [InvoiceController::class, 'index']);

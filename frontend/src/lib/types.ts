@@ -295,3 +295,16 @@ export type TenantDetail = Company & {
   recent_invoices: Invoice[];
   recent_users: User[];
 };
+
+export type AppNotification = {
+  id: string;
+  type: string;
+  data: {
+    title: string;
+    message: string;
+    url: string;
+    type: "info" | "warning" | "success" | "error";
+  };
+  read_at: string | null;
+  created_at: string;
+};

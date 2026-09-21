@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Toner;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -17,7 +18,7 @@ class TonerLowStockNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -29,5 +30,15 @@ class TonerLowStockNotification extends Notification
             ->line("Threshold: {$this->toner->low_stock_threshold} {$this->toner->unit}")
             ->action('View Toner', url('/toners'))
             ->line('Please restock soon to avoid service disruptions.');
+    }
+
+    public function toDatabase(object $notifiable): DatabaseMessage
+    {
+        return new DatabaseMessage([
+            'title' => 'Low Toner Stock',
+            'message' => "{$this->toner->name} ({$this->toner->part_number}) is running low — {$this->toner->current_stock} {$this->toner->unit} remaining.",
+            'url' => '/toners',
+            'type' => 'warning',
+        ]);
     }
 }

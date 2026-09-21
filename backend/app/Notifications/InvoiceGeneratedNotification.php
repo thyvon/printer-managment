@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -17,7 +18,7 @@ class InvoiceGeneratedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -30,5 +31,15 @@ class InvoiceGeneratedNotification extends Notification
             ->line("Total: {$this->invoice->currency} ".number_format($this->invoice->total, 2))
             ->action('View Invoice', url("/invoices/{$this->invoice->id}"))
             ->line('Please review and send to the customer.');
+    }
+
+    public function toDatabase(object $notifiable): DatabaseMessage
+    {
+        return new DatabaseMessage([
+            'title' => 'Invoice Generated',
+            'message' => "{$this->invoice->invoice_number} — {$this->invoice->currency} ".number_format($this->invoice->total, 2),
+            'url' => "/invoices/{$this->invoice->id}",
+            'type' => 'success',
+        ]);
     }
 }

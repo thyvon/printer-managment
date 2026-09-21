@@ -25,7 +25,8 @@
       "users": "Users",
       "settings": "Settings",
       "platform": "Platform Admin",
-      "auditLogs": "Audit Logs"
+      "auditLogs": "Audit Logs",
+      "notifications": "Notifications"
     },
     "logout": "Log out"
   },
@@ -547,5 +548,13 @@
     "allEvents": "All events",
     "allModels": "All models",
     "empty": "No audit logs found."
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "subtitle": "Your recent notifications and alerts.",
+    "empty": "No notifications.",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark read",
+    "view": "View"
   }
 }

@@ -19,6 +19,7 @@ import {
 import { PaginationControls } from "@/components/pagination-controls";
 import { StatusBadge } from "@/components/status-badge";
 import { Badge } from "@/components/ui/badge";
+import { fmtDateTime } from "@/lib/dates";
 import {
   Dialog,
   DialogContent,
@@ -194,7 +195,7 @@ export default function AuditLogsPage() {
                     onClick={() => setSelected(log)}
                   >
                     <TableCell className="text-muted-foreground text-xs">
-                      {new Date(log.created_at).toLocaleString()}
+                      {fmtDateTime(log.created_at)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {log.user?.name ?? "-"}
@@ -238,7 +239,7 @@ export default function AuditLogsPage() {
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground">{t("timestamp")}</p>
-                  <p>{new Date(selected.created_at).toLocaleString()}</p>
+                  <p>{fmtDateTime(selected.created_at)}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">{t("user")}</p>

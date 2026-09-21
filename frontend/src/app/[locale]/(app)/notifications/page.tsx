@@ -9,6 +9,7 @@ import { PageLoading } from "@/components/loading";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { fmtDateTime } from "@/lib/dates";
 import { PaginationControls } from "@/components/pagination-controls";
 import { useState } from "react";
 import Link from "next/link";
@@ -89,7 +90,7 @@ export default function NotificationsPage() {
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">{n.data.message}</p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(n.created_at).toLocaleString()}
+                      {fmtDateTime(n.created_at)}
                     </p>
                   </div>
                   <div className="flex gap-2">

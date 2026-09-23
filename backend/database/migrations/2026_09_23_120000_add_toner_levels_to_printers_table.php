@@ -9,15 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('printers', function (Blueprint $table) {
-            $table->string('brand')->nullable()->after('snmp_community');
-            $table->json('toner_levels')->nullable()->after('brand');
+            $table->json('toner_levels')->nullable()->after('snmp_community');
         });
     }
 
     public function down(): void
     {
         Schema::table('printers', function (Blueprint $table) {
-            $table->dropColumn(['brand', 'toner_levels']);
+            $table->dropColumn('toner_levels');
         });
     }
 };

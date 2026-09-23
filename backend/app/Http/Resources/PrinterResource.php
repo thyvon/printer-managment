@@ -18,6 +18,7 @@ class PrinterResource extends JsonResource
             'serial_number' => $this->serial_number,
             'ip_address' => $this->ip_address,
             'snmp_community' => $this->snmp_community,
+            'toner_levels' => $this->toner_levels,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

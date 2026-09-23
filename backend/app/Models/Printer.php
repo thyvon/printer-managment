@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['company_id', 'site_id', 'name', 'manufacturer', 'model', 'serial_number', 'ip_address', 'snmp_community', 'brand', 'status'])]
+#[Fillable(['company_id', 'site_id', 'name', 'manufacturer', 'model', 'serial_number', 'ip_address', 'snmp_community', 'status'])]
 class Printer extends Model
 {
     use BelongsToCompany, HasFactory, SoftDeletes;

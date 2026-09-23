@@ -92,6 +92,7 @@ export type Printer = {
   serial_number: string | null;
   ip_address: string | null;
   snmp_community: string | null;
+  toner_levels: Record<string, { current: number; max: number; percent: number }> | null;
   status: "online" | "offline" | "maintenance";
   created_at: string;
   updated_at: string;

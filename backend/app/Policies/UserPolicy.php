@@ -7,9 +7,14 @@ use App\Models\User;
 
 class UserPolicy extends BasePolicy
 {
+    protected function getPermissionPrefix(): string
+    {
+        return 'users';
+    }
+
     public function viewAny(User $user): bool
     {
-        return $user->role === UserRole::Admin;
+        return $user->role === UserRole::Admin || $user->hasPermission('users.view');
     }
 
     public function view(User $user, User $model): bool

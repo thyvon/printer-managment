@@ -21,7 +21,8 @@ import { PaginationControls } from "@/components/pagination-controls";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { StatusBadge } from "@/components/status-badge";
 import { UserForm } from "@/components/forms/user-form";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { PermissionsDialog } from "@/components/dialogs/permissions-dialog";
+import { Pencil, Plus, Shield, Trash2 } from "lucide-react";
 
 export default function UsersPage() {
   const t = useTranslations("Users");
@@ -31,6 +32,7 @@ export default function UsersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
   const [deleting, setDeleting] = useState<User | null>(null);
+  const [permissionsUser, setPermissionsUser] = useState<User | null>(null);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users", page],
@@ -114,6 +116,14 @@ export default function UsersPage() {
                         <Button
                           variant="ghost"
                           size="icon-sm"
+                          aria-label={t("permissions")}
+                          onClick={() => setPermissionsUser(user)}
+                        >
+                          <Shield />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
                           aria-label={tCommon("edit")}
                           onClick={() => {
                             setEditing(user);
@@ -148,6 +158,12 @@ export default function UsersPage() {
         onOpenChange={setFormOpen}
         user={editing}
         onSuccess={invalidate}
+      />
+
+      <PermissionsDialog
+        open={Boolean(permissionsUser)}
+        onOpenChange={(open) => !open && setPermissionsUser(null)}
+        user={permissionsUser}
       />
 
       <ConfirmDialog

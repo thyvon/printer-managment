@@ -331,6 +331,12 @@
     },
     "actions": {
       "create": "New user"
+    },
+    "permissions": {
+      "title": "Permissions — {name}",
+      "cancel": "Cancel",
+      "save": "Save permissions",
+      "saving": "Saving..."
     }
   },
   "Contacts": {

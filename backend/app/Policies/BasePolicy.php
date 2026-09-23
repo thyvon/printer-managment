@@ -19,21 +19,43 @@ abstract class BasePolicy
 
     public function create(User $user): bool
     {
-        return $user->role !== UserRole::Staff;
+        if ($user->role === UserRole::Admin) {
+            return true;
+        }
+
+        if ($user->role === UserRole::Manager) {
+            return true;
+        }
+
+        return $user->hasPermission($this->getPermissionPrefix().'.create');
     }
 
     public function update(User $user, $model): bool
     {
-        return true;
+        if ($user->role === UserRole::Admin) {
+            return true;
+        }
+
+        if ($user->role === UserRole::Manager) {
+            return true;
+        }
+
+        return $user->hasPermission($this->getPermissionPrefix().'.update');
     }
 
     public function delete(User $user, $model): bool
     {
-        return $user->role === UserRole::Admin;
+        if ($user->role === UserRole::Admin) {
+            return true;
+        }
+
+        return $user->hasPermission($this->getPermissionPrefix().'.delete');
     }
 
     public function forceDelete(User $user, $model): bool
     {
         return false;
     }
+
+    abstract protected function getPermissionPrefix(): string;
 }

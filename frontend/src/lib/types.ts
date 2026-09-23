@@ -18,6 +18,7 @@ export type User = {
   email: string;
   role: string;
   is_platform_admin: boolean;
+  permissions: string[];
   created_at: string;
   updated_at: string;
   company?: Company;

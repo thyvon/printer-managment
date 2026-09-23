@@ -26,9 +26,9 @@ import { tokenStore } from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "/api";
 
-function formatMoney(amount: number, currency: string) {
+function formatMoney(amount: number | null | undefined, currency: string) {
   const symbol = currency === "KHR" ? "៛" : "$";
-  return `${symbol}${amount.toLocaleString("en-US", {
+  return `${symbol}${(amount ?? 0).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;
@@ -92,7 +92,7 @@ export default function InvoiceDetailPage({
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");
                   a.href = url;
-                  a.download = `${data.invoice_number}.pdf`;
+                  a.download = `${data?.invoice_number ?? "invoice"}.pdf`;
                   a.click();
                   URL.revokeObjectURL(url);
                 });

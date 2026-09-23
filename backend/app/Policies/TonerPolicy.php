@@ -2,4 +2,10 @@
 
 namespace App\Policies;
 
-class TonerPolicy extends BasePolicy {}
+class TonerPolicy extends BasePolicy
+{
+    protected function getPermissionPrefix(): string
+    {
+        return 'toners';
+    }
+}

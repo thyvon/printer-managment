@@ -48,6 +48,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('contracts', ContractController::class);
     Route::apiResource('collectors', CollectorController::class);
     Route::apiResource('users', UserController::class)->except(['create', 'edit'])->middleware('admin');
+    Route::get('permissions', [UserController::class, 'permissions']);
+    Route::put('users/{user}/permissions', [UserController::class, 'updatePermissions']);
     Route::apiResource('service-tickets', ServiceTicketController::class);
     Route::apiResource('toners', TonerController::class);
     Route::apiResource('audit-logs', AuditLogController::class)->only(['index']);

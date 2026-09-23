@@ -68,4 +68,51 @@ class CollectorAgentController extends Controller
             'count' => count($data['readings']),
         ]);
     }
+
+    public function tonerLevels(Request $request): JsonResponse
+    {
+        $collector = $request->get('collector');
+
+        $data = $request->validate([
+            'levels' => ['required', 'array', 'min:1'],
+            'levels.*.printer_id' => ['required', 'exists:printers,id'],
+            'levels.*.toner_levels' => ['required', 'array'],
+            'levels.*.toner_levels.*.color' => ['required', 'string', 'in:black,cyan,magenta,yellow'],
+            'levels.*.toner_levels.*.current' => ['required', 'integer', 'min:0'],
+            'levels.*.toner_levels.*.max' => ['required', 'integer', 'min:1'],
+        ]);
+
+        if ($collector->site_id) {
+            $sitePrinterIds = Printer::where('site_id', $collector->site_id)->pluck('id')->all();
+
+            foreach ($data['levels'] as $item) {
+                if (! in_array($item['printer_id'], $sitePrinterIds)) {
+                    throw ValidationException::withMessages([
+                        'levels.*.printer_id' => "Printer {$item['printer_id']} does not belong to this collector's site.",
+                    ]);
+                }
+            }
+        }
+
+        foreach ($data['levels'] as $item) {
+            $printer = Printer::findOrFail($item['printer_id']);
+
+            $tonerLevels = collect($item['toner_levels'])->mapWithKeys(function ($t) {
+                $percent = $t['max'] > 0 ? round(($t['current'] / $t['max']) * 100) : 0;
+
+                return [$t['color'] => [
+                    'current' => $t['current'],
+                    'max' => $t['max'],
+                    'percent' => $percent,
+                ]];
+            })->toArray();
+
+            $printer->update(['toner_levels' => $tonerLevels]);
+        }
+
+        return response()->json([
+            'message' => 'ok',
+            'count' => count($data['levels']),
+        ]);
+    }
 }

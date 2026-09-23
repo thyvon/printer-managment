@@ -65,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::prefix('collector')->middleware('collector.auth')->group(function () {
     Route::post('/heartbeat', [CollectorAgentController::class, 'heartbeat']);
     Route::post('/readings', [CollectorAgentController::class, 'readings']);
+    Route::post('/toner-levels', [CollectorAgentController::class, 'tonerLevels']);
 });
 
 Route::prefix('platform')->middleware(['auth:sanctum', 'platform.admin'])->group(function () {

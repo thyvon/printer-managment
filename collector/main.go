@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -82,6 +84,34 @@ func pollAndBuffer(cfg *Config, db *bbolt.DB) {
 	}
 
 	drainBufferedReadings(cfg, db)
+
+	// Poll toner levels and send immediately (not buffered)
+	pollAndSendTonerLevels(cfg)
+}
+
+func pollAndSendTonerLevels(cfg *Config) {
+	var levels []*tonerReading
+
+	for _, device := range cfg.Devices {
+		t, err := pollTonerLevels(device)
+		if err != nil {
+			log.Printf("toner poll %s failed: %v", device.IP, err)
+			continue
+		}
+		levels = append(levels, t)
+
+		parts := make([]string, len(t.TonerLevels))
+		for i, tl := range t.TonerLevels {
+			parts[i] = fmt.Sprintf("%s=%d/%d", tl.Color, tl.Current, tl.Max)
+		}
+		log.Printf("toner: printer=%d %s", t.PrinterID, strings.Join(parts, " "))
+	}
+
+	if err := sendTonerLevels(cfg, levels); err != nil {
+		log.Printf("toner upload failed: %v", err)
+	} else if len(levels) > 0 {
+		log.Printf("toner levels sent for %d printer(s)", len(levels))
+	}
 }
 
 func drainBufferedReadings(cfg *Config, db *bbolt.DB) {

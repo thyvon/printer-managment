@@ -18,6 +18,10 @@ type readingsRequest struct {
 	Readings []*reading `json:"readings"`
 }
 
+type tonerLevelsRequest struct {
+	Levels []*tonerReading `json:"levels"`
+}
+
 type apiResponse struct {
 	Message string `json:"message"`
 	Count   int    `json:"count,omitempty"`
@@ -110,4 +114,37 @@ func drainBuffer(cfg *Config, readings []*reading) error {
 		}
 	}
 	return fmt.Errorf("upload failed after %d retries: %w", maxRetries, err)
+}
+
+func sendTonerLevels(cfg *Config, levels []*tonerReading) error {
+	if len(levels) == 0 {
+		return nil
+	}
+
+	body := tonerLevelsRequest{Levels: levels}
+	payload, err := json.Marshal(body)
+	if err != nil {
+		return fmt.Errorf("marshal toner levels: %w", err)
+	}
+
+	url := cfg.APIEndpoint + "/api/collector/toner-levels"
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(payload))
+	if err != nil {
+		return fmt.Errorf("create toner levels request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+cfg.APIToken)
+
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("send toner levels: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("toner levels failed: %d %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	return nil
 }

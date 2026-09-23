@@ -6,10 +6,53 @@ heartbeat_interval_seconds: 300
 db_path: "readings.db"
 upload_batch_size: 50
 
+# Supported brands: hp, xerox, canon, ricoh, brother, lexmark, konica
+# Leave brand empty for total-page-count only (any SNMP printer)
+
 devices:
+  # HP LaserJet
   - ip: "192.168.1.100"
     printer_id: 1
     community: "public"
+    brand: "hp"
+
+  # Xerox WorkCentre
   - ip: "192.168.1.101"
     printer_id: 2
+    community: "public"
+    brand: "xerox"
+
+  # Canon imageRUNNER
+  - ip: "192.168.1.102"
+    printer_id: 3
+    community: "public"
+    brand: "canon"
+
+  # Ricoh Aficio
+  - ip: "192.168.1.103"
+    printer_id: 4
+    community: "public"
+    brand: "ricoh"
+
+  # Brother MFC
+  - ip: "192.168.1.104"
+    printer_id: 5
+    community: "public"
+    brand: "brother"
+
+  # Lexmark
+  - ip: "192.168.1.105"
+    printer_id: 6
+    community: "public"
+    brand: "lexmark"
+
+  # Konica Minolta bizhub
+  - ip: "192.168.1.106"
+    printer_id: 7
+    community: "public"
+    brand: "konica"
+
+  # Generic (total pages only)
+  - ip: "192.168.1.107"
+    printer_id: 8
     community: "public"

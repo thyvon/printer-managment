@@ -10,6 +10,7 @@ type DeviceConfig struct {
 	IP        string `mapstructure:"ip"`
 	PrinterID int    `mapstructure:"printer_id"`
 	Community string `mapstructure:"community"`
+	Brand     string `mapstructure:"brand"`
 }
 
 type Config struct {

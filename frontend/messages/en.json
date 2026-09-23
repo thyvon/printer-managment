@@ -125,6 +125,10 @@
     "priority": "Priority",
     "emptyToners": "All toners are well stocked.",
     "emptyTickets": "No open tickets.",
+    "lowTonerAlerts": "Low Toner Alerts",
+    "emptyLowToner": "All printer toner levels are above 20%.",
+    "printerName": "Printer",
+    "tonerLevels": "Levels",
     "viewAll": "View all"
   },
   "Customers": {

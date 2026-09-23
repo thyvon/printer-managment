@@ -60,6 +60,20 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $lowTonerPrinters = Printer::whereNotNull('toner_levels')
+            ->with('site.customer')
+            ->get()
+            ->filter(function (Printer $p) {
+                foreach ($p->toner_levels as $level) {
+                    if (isset($level['percent']) && $level['percent'] <= 20) {
+                        return true;
+                    }
+                }
+                return false;
+            })
+            ->take(5)
+            ->values();
+
         return response()->json([
             'counts' => [
                 'customers' => Customer::count(),
@@ -92,6 +106,13 @@ class DashboardController extends Controller
                 'customer_name' => $t->customer?->name,
                 'printer_name' => $t->printer?->name,
                 'scheduled_at' => $t->scheduled_at?->toIso8601String(),
+            ]),
+            'low_toner_printers' => $lowTonerPrinters->map(fn ($p) => [
+                'id' => $p->id,
+                'name' => $p->name,
+                'site_name' => $p->site?->name,
+                'customer_name' => $p->site?->customer?->name,
+                'toner_levels' => $p->toner_levels,
             ]),
         ]);
     }

@@ -257,6 +257,13 @@ export type DashboardSummary = {
     printer_name: string | null;
     scheduled_at: string | null;
   }>;
+  low_toner_printers: Array<{
+    id: number;
+    name: string;
+    site_name: string | null;
+    customer_name: string | null;
+    toner_levels: Record<string, { current: number; max: number; percent: number }>;
+  }>;
 };
 
 export type PlatformSummary = {

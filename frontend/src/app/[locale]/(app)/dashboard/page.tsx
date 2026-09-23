@@ -71,6 +71,12 @@ export default function DashboardPage() {
     { key: "activeContracts", value: data.counts.active_contracts, icon: FileText },
   ];
 
+  function tonerColorBar(percent: number) {
+    if (percent <= 10) return "bg-red-500";
+    if (percent <= 20) return "bg-amber-500";
+    return "bg-green-500";
+  }
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -138,6 +144,59 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Printer className="size-4 text-amber-500" />
+              {t("lowTonerAlerts")}
+            </CardTitle>
+            <Link href="/printers" className="text-sm text-muted-foreground hover:text-foreground">
+              {t("viewAll")}
+            </Link>
+          </CardHeader>
+          <CardContent className="p-0">
+            {data.low_toner_printers.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("emptyLowToner")}
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("printerName")}</TableHead>
+                    <TableHead>{t("customer")}</TableHead>
+                    <TableHead>{t("tonerLevels")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.low_toner_printers.map((printer) => (
+                    <TableRow key={printer.id}>
+                      <TableCell className="font-medium">{printer.name}</TableCell>
+                      <TableCell className="text-muted-foreground text-xs">
+                        {printer.customer_name ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-1.5">
+                          {Object.entries(printer.toner_levels).map(([color, level]) => (
+                            <div key={color} className="flex items-center gap-1" title={`${color}: ${level.percent}%`}>
+                              <div className="h-2 w-8 rounded-full bg-muted overflow-hidden">
+                                <div className={`h-full ${tonerColorBar(level.percent)}`} style={{ width: `${level.percent}%` }} />
+                              </div>
+                              <span className="text-[10px] text-muted-foreground uppercase">{color.slice(0, 1)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center gap-2">

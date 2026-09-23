@@ -15,6 +15,8 @@ class InvoiceController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', Invoice::class);
+
         $query = Invoice::with('customer', 'lines')->latest();
 
         if ($request->has('customer_id')) {
@@ -26,11 +28,15 @@ class InvoiceController extends Controller
 
     public function show(Invoice $invoice)
     {
+        $this->authorize('view', $invoice);
+
         return new InvoiceResource($invoice->load('customer', 'lines'));
     }
 
     public function generate(Request $request, InvoicingService $service)
     {
+        $this->authorize('create', Invoice::class);
+
         $data = $request->validate([
             'customer_id' => ['required', 'exists:customers,id'],
             'month' => ['required', 'date_format:Y-m'],
@@ -46,6 +52,8 @@ class InvoiceController extends Controller
 
     public function pdf(Invoice $invoice)
     {
+        $this->authorize('view', $invoice);
+
         $invoice->load('customer', 'lines');
 
         return Pdf::view('invoice.pdf', compact('invoice'))

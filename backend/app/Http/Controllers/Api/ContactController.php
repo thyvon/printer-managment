@@ -12,6 +12,8 @@ class ContactController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Contact::class);
+
         $query = Contact::latest();
 
         if (request()->has('customer_id')) {
@@ -23,6 +25,8 @@ class ContactController extends Controller
 
     public function store(StoreContactRequest $request)
     {
+        $this->authorize('create', Contact::class);
+
         $contact = Contact::create($request->validated());
 
         return new ContactResource($contact);
@@ -30,11 +34,15 @@ class ContactController extends Controller
 
     public function show(Contact $contact)
     {
+        $this->authorize('view', $contact);
+
         return new ContactResource($contact);
     }
 
     public function update(UpdateContactRequest $request, Contact $contact)
     {
+        $this->authorize('update', $contact);
+
         $contact->update($request->validated());
 
         return new ContactResource($contact);
@@ -42,6 +50,8 @@ class ContactController extends Controller
 
     public function destroy(Contact $contact)
     {
+        $this->authorize('delete', $contact);
+
         $contact->delete();
 
         return response()->json(null, 204);

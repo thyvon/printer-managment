@@ -12,11 +12,15 @@ class CollectorController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Collector::class);
+
         return CollectorResource::collection(Collector::latest()->paginate(request()->integer('per_page', 15)));
     }
 
     public function store(StoreCollectorRequest $request)
     {
+        $this->authorize('create', Collector::class);
+
         $collector = Collector::create([
             ...$request->validated(),
             'token' => Collector::makeToken(),
@@ -28,11 +32,15 @@ class CollectorController extends Controller
 
     public function show(Collector $collector)
     {
+        $this->authorize('view', $collector);
+
         return new CollectorResource($collector);
     }
 
     public function update(UpdateCollectorRequest $request, Collector $collector)
     {
+        $this->authorize('update', $collector);
+
         $collector->update($request->validated());
 
         return new CollectorResource($collector);
@@ -40,6 +48,8 @@ class CollectorController extends Controller
 
     public function destroy(Collector $collector)
     {
+        $this->authorize('delete', $collector);
+
         $collector->delete();
 
         return response()->json(null, 204);

@@ -12,6 +12,8 @@ class ContractController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Contract::class);
+
         return ContractResource::collection(
             Contract::with('pricingTiers')->latest()->paginate(request()->integer('per_page', 15))
         );
@@ -19,6 +21,8 @@ class ContractController extends Controller
 
     public function store(StoreContractRequest $request)
     {
+        $this->authorize('create', Contract::class);
+
         $contract = Contract::create($request->safe()->except('pricing_tiers'));
 
         if ($request->has('pricing_tiers')) {
@@ -30,11 +34,15 @@ class ContractController extends Controller
 
     public function show(Contract $contract)
     {
+        $this->authorize('view', $contract);
+
         return new ContractResource($contract->load('pricingTiers'));
     }
 
     public function update(UpdateContractRequest $request, Contract $contract)
     {
+        $this->authorize('update', $contract);
+
         $contract->update($request->safe()->except('pricing_tiers'));
 
         if ($request->has('pricing_tiers')) {
@@ -52,6 +60,8 @@ class ContractController extends Controller
 
     public function destroy(Contract $contract)
     {
+        $this->authorize('delete', $contract);
+
         $contract->delete();
 
         return response()->json(null, 204);

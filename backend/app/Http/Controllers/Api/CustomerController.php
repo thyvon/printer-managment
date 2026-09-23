@@ -12,6 +12,8 @@ class CustomerController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Customer::class);
+
         return CustomerResource::collection(
             Customer::withCount('sites')->latest()->paginate(request()->integer('per_page', 15))
         );
@@ -19,6 +21,8 @@ class CustomerController extends Controller
 
     public function store(StoreCustomerRequest $request)
     {
+        $this->authorize('create', Customer::class);
+
         $customer = Customer::create($request->validated());
 
         return new CustomerResource($customer);
@@ -26,11 +30,15 @@ class CustomerController extends Controller
 
     public function show(Customer $customer)
     {
+        $this->authorize('view', $customer);
+
         return new CustomerResource($customer->loadCount('sites')->load(['sites', 'contacts']));
     }
 
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
+        $this->authorize('update', $customer);
+
         $customer->update($request->validated());
 
         return new CustomerResource($customer);
@@ -38,6 +46,8 @@ class CustomerController extends Controller
 
     public function destroy(Customer $customer)
     {
+        $this->authorize('delete', $customer);
+
         $customer->delete();
 
         return response()->json(null, 204);

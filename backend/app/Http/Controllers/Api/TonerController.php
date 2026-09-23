@@ -12,6 +12,8 @@ class TonerController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Toner::class);
+
         $query = Toner::latest();
 
         if (request()->has('low_stock')) {
@@ -26,6 +28,8 @@ class TonerController extends Controller
 
     public function store(StoreTonerRequest $request)
     {
+        $this->authorize('create', Toner::class);
+
         $toner = Toner::create($request->validated());
 
         return new TonerResource($toner);
@@ -33,11 +37,15 @@ class TonerController extends Controller
 
     public function show(Toner $toner)
     {
+        $this->authorize('view', $toner);
+
         return new TonerResource($toner);
     }
 
     public function update(UpdateTonerRequest $request, Toner $toner)
     {
+        $this->authorize('update', $toner);
+
         $toner->update($request->validated());
 
         return new TonerResource($toner);
@@ -45,6 +53,8 @@ class TonerController extends Controller
 
     public function destroy(Toner $toner)
     {
+        $this->authorize('delete', $toner);
+
         $toner->delete();
 
         return response()->json(null, 204);

@@ -12,6 +12,8 @@ class SiteController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Site::class);
+
         $query = Site::latest();
 
         if (request()->has('customer_id')) {
@@ -23,6 +25,8 @@ class SiteController extends Controller
 
     public function store(StoreSiteRequest $request)
     {
+        $this->authorize('create', Site::class);
+
         $site = Site::create($request->validated());
 
         return new SiteResource($site);
@@ -30,11 +34,15 @@ class SiteController extends Controller
 
     public function show(Site $site)
     {
+        $this->authorize('view', $site);
+
         return new SiteResource($site);
     }
 
     public function update(UpdateSiteRequest $request, Site $site)
     {
+        $this->authorize('update', $site);
+
         $site->update($request->validated());
 
         return new SiteResource($site);
@@ -42,6 +50,8 @@ class SiteController extends Controller
 
     public function destroy(Site $site)
     {
+        $this->authorize('delete', $site);
+
         $site->delete();
 
         return response()->json(null, 204);

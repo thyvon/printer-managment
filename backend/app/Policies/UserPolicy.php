@@ -14,7 +14,7 @@ class UserPolicy extends BasePolicy
 
     public function view(User $user, User $model): bool
     {
-        return $user->role === Role::Admin->value || $user->id === $model->id;
+        return $user->role === UserRole::Admin || $user->id === $model->id;
     }
 
     public function create(User $user): bool
@@ -24,11 +24,11 @@ class UserPolicy extends BasePolicy
 
     public function update(User $user, User $model): bool
     {
-        return $user->role === Role::Admin->value || $user->id === $model->id;
+        return $user->role === UserRole::Admin || $user->id === $model->id;
     }
 
     public function delete(User $user, User $model): bool
     {
-        return $user->role === Role::Admin->value && $user->id !== $model->id;
+        return $user->role === UserRole::Admin && $user->id !== $model->id;
     }
 }

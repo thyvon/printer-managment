@@ -12,6 +12,8 @@ class ServiceTicketController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', ServiceTicket::class);
+
         $query = ServiceTicket::with(['customer', 'site', 'printer', 'assignedUser'])->latest();
 
         if (request()->has('customer_id')) {
@@ -35,6 +37,8 @@ class ServiceTicketController extends Controller
 
     public function store(StoreServiceTicketRequest $request)
     {
+        $this->authorize('create', ServiceTicket::class);
+
         $data = $request->validated();
         $data['status'] = $data['status'] ?? 'open';
         $ticket = ServiceTicket::create($data);
@@ -44,11 +48,15 @@ class ServiceTicketController extends Controller
 
     public function show(ServiceTicket $serviceTicket)
     {
+        $this->authorize('view', $serviceTicket);
+
         return new ServiceTicketResource($serviceTicket->load(['customer', 'site', 'printer', 'assignedUser']));
     }
 
     public function update(UpdateServiceTicketRequest $request, ServiceTicket $serviceTicket)
     {
+        $this->authorize('update', $serviceTicket);
+
         $serviceTicket->update($request->validated());
 
         return new ServiceTicketResource($serviceTicket->load(['customer', 'site', 'printer', 'assignedUser']));
@@ -56,6 +64,8 @@ class ServiceTicketController extends Controller
 
     public function destroy(ServiceTicket $serviceTicket)
     {
+        $this->authorize('delete', $serviceTicket);
+
         $serviceTicket->delete();
 
         return response()->json(null, 204);
